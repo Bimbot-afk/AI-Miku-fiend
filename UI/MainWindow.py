@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QWidget, 
 from PySide6.QtCore import (QSize, Qt, QPoint)
 from PySide6.QtGui import (QImage, QPixmap, QIcon, QAction)
 from UI.ChatbotWindowMiku import ChatbotWindowMiku
+from UI.configuration import configurationMiku
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,10 +11,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Miku Friend")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.chat_open = None
+        self.configuration_open = None
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.derecha_inferior_ventana = self.frameGeometry().bottomRight()
         self.posicion_inicial = self.derecha_inferior_ventana
-        self.resize(100, 100)
+        self.resize(250, 250)
         self.move(self.posicion_inicial)
 
         label = QLabel()
@@ -56,6 +58,7 @@ class MainWindow(QMainWindow):
         """)
 
         menu.addAction(QAction("Open Chat", self, triggered=self.open_chat))
+        menu.addAction(QAction("Configuration", self, triggered=self.open_configuration))
         menu.addAction(QAction("Exit", self, triggered=self.close))
         menu.exec(self.mapToGlobal(pos))
 
@@ -67,6 +70,13 @@ class MainWindow(QMainWindow):
         self.chat_open.raise_()
         self.chat_open.activateWindow()
 
+    def open_configuration(self):
+        if self.configuration_open is None:
+            self.configuration_open = configurationMiku(self)
+
+        self.configuration_open.show()
+        self.configuration_open.raise_()
+        self.configuration_open.activateWindow()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
