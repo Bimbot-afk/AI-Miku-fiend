@@ -136,17 +136,17 @@ class ChatbotWindowMiku(QMainWindow):
         self.worker = consultar_miku(self.message_history)
         
         # Obtener o instanciar la ventana de configuración en segundo plano si es necesario
-        config_window = self.main_window.configuration_open
+        config_window = self.main_window.config_window
         if config_window is None:
             from UI.configuration import configurationMiku
             config_window = configurationMiku(self.main_window)
-            self.main_window.configuration_open = config_window
+            self.main_window.config_window = config_window
             
-        # Pasar el idioma y el nombre de usuario al hilo
-        self.worker.miku_config(config_window, config_window.send_config())
-        
+        # Cargar la configuración en el hilo
+        self.worker.miku_config()
         self.worker.finished_response.connect(self.on_response_received)
         self.worker.start()
+
 
     def on_response_received(self, response):
         # Guardar la respuesta en el historial

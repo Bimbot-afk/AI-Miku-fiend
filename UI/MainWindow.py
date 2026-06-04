@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Miku Friend")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.chat_open = None
-        self.configuration_open = None
+        self.config_window = None
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.derecha_inferior_ventana = self.frameGeometry().bottomRight()
         self.posicion_inicial = self.derecha_inferior_ventana
@@ -71,12 +71,12 @@ class MainWindow(QMainWindow):
         self.chat_open.activateWindow()
 
     def open_configuration(self):
-        if self.configuration_open is None:
-            self.configuration_open = configurationMiku(self)
+        if self.config_window is None:
+            self.config_window = configurationMiku(self)
 
-        self.configuration_open.show()
-        self.configuration_open.raise_()
-        self.configuration_open.activateWindow()
+        self.config_window.show()
+        self.config_window.raise_()
+        self.config_window.activateWindow()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
