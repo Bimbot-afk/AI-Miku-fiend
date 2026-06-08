@@ -1,15 +1,19 @@
 from PySide6.QtCore import QThread
 from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel, QMenu)
 from PySide6.QtCore import (QSize, Qt, QPoint)
-from PySide6.QtGui import (QImage, QPixmap, QIcon, QAction)
+from PySide6.QtGui import (QImage, QPixmap, QIcon, QAction, QMovie)
 from UI.ChatbotWindowMiku import ChatbotWindowMiku
 from UI.configuration import configurationMiku
+import ctypes
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Miku Friend")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
         self.chat_open = None
         self.config_window = None
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -19,7 +23,9 @@ class MainWindow(QMainWindow):
         self.move(self.posicion_inicial)
 
         label = QLabel()
-        label.setPixmap(QPixmap("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Gifs/m2.gif"))
+        self.movie = QMovie("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Gifs/m2.gif")
+        label.setMovie(self.movie)
+        self.movie.start()
         label.resize(100,100)
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)

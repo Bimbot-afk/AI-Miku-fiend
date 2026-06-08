@@ -1,3 +1,4 @@
+from PySide6.QtGui import QIcon
 import json
 import os
 from PySide6.QtWidgets import QMessageBox
@@ -7,11 +8,18 @@ from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout,
                                 QLabel, QTextEdit, QLineEdit, QHBoxLayout, QListWidget, QStackedWidget)
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import (Qt, QTimer)
+from dotenv import load_dotenv
+import ctypes
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
+
+load_dotenv()
 
 class configurationMiku(QMainWindow):
     def __init__(self, main_window=None):
         super().__init__(main_window)
         self.main_window = main_window
+        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
         self.setWindowTitle("Configuration")
         self.resize(800, 550)
         self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
@@ -58,6 +66,8 @@ class configurationMiku(QMainWindow):
         self.user_name = "Usuario"
         self.personalizated_promt = "nada"
         self.miku_personality = "Miku classic"
+        self.api_key = os.getenv("api_key")
+        self.server_url = os.getenv("url_api_key")
         if os.path.exists(config_path):
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
@@ -71,9 +81,24 @@ class configurationMiku(QMainWindow):
 
     def save_config(self):
         config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.json")
+        
+        # Detectar qué archivo .env usar
+        env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
+        env_in_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
+        env_path = env_in_folder if os.path.exists(env_in_folder) else env_in_root
+
         try:
             with open(config_path, "w", encoding="utf-8") as f:
-                json.dump({"idiom": self.miku_idiom, "name": self.user_name, "personalizated_promt": self.personalizated_promt, "miku_personality": self.miku_personality}, f, ensure_ascii=False, indent=4)
+                json.dump({
+                    "idiom": self.miku_idiom,
+                    "name": self.user_name,
+                    "personalizated_promt": self.personalizated_promt,
+                    "miku_personality": self.miku_personality,
+                }, 
+                f, ensure_ascii=False, indent=4)
+            with open(env_path, "w", encoding="utf-8") as f:
+                f.write(f"api_key={self.api_key}\n")
+                f.write(f"url_api_key={self.server_url}\n")
         except Exception as e:
             print(f"Error saving config: {e}")
 
@@ -104,8 +129,15 @@ class configurationMiku(QMainWindow):
         self.input_personalities.addItems(self.personalities)
         self.input_personalities.setCurrentText(self.miku_personality)
         form.addRow("Personalities", self.input_personalities)
-
         
+        self.input_api_key = QLineEdit()
+        self.input_api_key.setText(self.api_key)
+        form.addRow("API Key", self.input_api_key)
+
+        self.input_server_url = QLineEdit()
+        self.input_server_url.setText(self.server_url)
+        form.addRow("Server URL", self.input_server_url)
+             
         layout.addLayout(form)
 
         self.button_guardar = QPushButton("Guardar")
@@ -123,6 +155,8 @@ class configurationMiku(QMainWindow):
         self.user_name = self.input_name.text()
         self.personalizated_promt = self.input_prompt.toPlainText()
         self.miku_personality = self.input_personalities.currentText()
+        self.api_key = self.input_api_key.text()
+        self.server_url = self.input_server_url.text()
         self.save_config()
         QMessageBox.information(self, "Configuración guardada", "Configuración guardada correctamente")
         self.close()

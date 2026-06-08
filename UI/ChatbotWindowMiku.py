@@ -1,14 +1,20 @@
+from PySide6.QtGui import QIcon
 from core.brain import consultar_miku
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel, QTextEdit, QLineEdit, QHBoxLayout)
 from PySide6.QtCore import (Qt, QTimer)
+import ctypes
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 
 class ChatbotWindowMiku(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
         self.setWindowTitle("Miku Friend Chat")
+        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
         self.setGeometry(100, 100, 300, 500)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.miku_thinking = False
 
         # Central Widget since QMainWindow requires a central widget for layouts
         self.central_widget = QWidget()
@@ -24,6 +30,11 @@ class ChatbotWindowMiku(QMainWindow):
         self.chat_history.setReadOnly(True)
         self.layout.addWidget(self.chat_history)
 
+        # Etiqueta de estado para animaciones de carga
+        self.status_label = QLabel("")
+        self.status_label.setStyleSheet("color: #888888; font-style: italic; font-size: 11px;")
+        self.layout.addWidget(self.status_label)
+
         # Input and Send layout
         self.input_layout = QHBoxLayout()
         self.input_layout.setSpacing(8)
@@ -38,11 +49,23 @@ class ChatbotWindowMiku(QMainWindow):
         self.send_button = QPushButton("Send")
         self.send_button.clicked.connect(self.send_message)
         self.input_layout.addWidget(self.send_button)
+
+        #create restart button
+        self.restart_button = QPushButton("Restart")
+        self.restart_button.clicked.connect(self.restart_chat)
+        self.input_layout.addWidget(self.restart_button)
         
         self.layout.addLayout(self.input_layout)
 
         # Inicializar el historial de conversación para Ollama
         self.message_history = []
+        self.long_term_memory = []
+        self.active_workers = []
+
+        # Timer para animación de carga ("Miku is thinking...")
+        self.thinking_timer = QTimer(self)
+        self.thinking_timer.timeout.connect(self.update_thinking_dots)
+        self.thinking_dots_count = 0
 
         # Apply Hatsune Miku visual design system stylesheet
         self.apply_miku_stylesheet()
@@ -109,6 +132,23 @@ class ChatbotWindowMiku(QMainWindow):
             }
         """)
 
+    def restart_chat(self):
+        self.thinking_timer.stop()
+        self.status_label.setText("")
+        for worker in self.active_workers:
+            if worker.isRunning():
+                worker.quit()
+                worker.wait(1000)
+        self.active_workers.clear()
+        self.message_history = []
+        self.long_term_memory = []
+        self.chat_history.clear()
+        self.chat_history.append('<p style="color: grey;">Chat restarted</p>')
+        self.send_button.setEnabled(True)
+        self.send_button.setStyleSheet("background-color: #39c5bb;")
+        self.user_input.setEnabled(True)
+        self.user_input.clear()
+
     def send_message(self):
         user_message = self.user_input.text().strip()
         if user_message:
@@ -119,21 +159,22 @@ class ChatbotWindowMiku(QMainWindow):
             
             # Guardar el mensaje en el historial
             self.message_history.append({'role': 'user', 'content': user_message})
-            
-            # Limitar el historial a los últimos 10 mensajes para mantenerlo rápido
-            if len(self.message_history) > 10:
-                self.message_history = self.message_history[-10:]
                 
             self.display_miku_response()
 
     def display_miku_response(self):
-        self.chat_history.append('<p style="color: grey;">Miku is thinking...</p>')
         self.send_button.setEnabled(False)
         self.user_input.setEnabled(False)
         self.send_button.setStyleSheet("background-color: gray;")
         
-        # Iniciar el hilo pasando todo el historial
-        self.worker = consultar_miku(self.message_history)
+        # Iniciar animación de carga en la etiqueta de estado
+        self.status_label.setText("Miku is thinking.")
+        self.thinking_dots_count = 1
+        self.thinking_timer.start(500) # Se actualiza cada 500ms
+        
+        # Iniciar el hilo pasando todo el historial y la memoria a largo plazo
+        worker = consultar_miku(self.message_history, self.long_term_memory)
+        self.active_workers.append(worker)
         
         # Obtener o instanciar la ventana de configuración en segundo plano si es necesario
         config_window = self.main_window.config_window
@@ -142,13 +183,25 @@ class ChatbotWindowMiku(QMainWindow):
             config_window = configurationMiku(self.main_window)
             self.main_window.config_window = config_window
             
-        # Cargar la configuración en el hilo
-        self.worker.miku_config()
-        self.worker.finished_response.connect(self.on_response_received)
-        self.worker.start()
+        # Cargar la configuración en el hilo y conectar señales
+        worker.miku_config()
+        worker.finished_response.connect(self.on_response_received)
+        worker.finished.connect(lambda: self.cleanup_worker(worker))
+        worker.start()
 
 
     def on_response_received(self, response):
+        self.thinking_timer.stop()
+        self.status_label.setText("")
+
+        # mostrar error si no hay api/url
+        if response == "error":
+            self.chat_history.append('<p style="color: red;">Error: API_KEY o Server URL no encontrado</p>')
+            self.send_button.setEnabled(True)
+            self.user_input.setEnabled(True)
+            self.send_button.setStyleSheet("background-color: #39c5bb;")
+            return
+        
         # Guardar la respuesta en el historial
         self.message_history.append({'role': 'assistant', 'content': response})
         
@@ -157,4 +210,22 @@ class ChatbotWindowMiku(QMainWindow):
         self.send_button.setEnabled(True)
         self.user_input.setEnabled(True)
         self.send_button.setStyleSheet("background-color: #39c5bb;")
+
+    def update_thinking_dots(self):
+        self.thinking_dots_count = (self.thinking_dots_count % 3) + 1
+        dots = "." * self.thinking_dots_count
+        self.status_label.setText(f"Miku is thinking{dots}")
+
+    def cleanup_worker(self, worker):
+        if worker in self.active_workers:
+            self.active_workers.remove(worker)
+
+    def closeEvent(self, event):
+        self.thinking_timer.stop()
+        for worker in self.active_workers:
+            if worker.isRunning():
+                worker.quit()
+                worker.wait(1000)
+        self.active_workers.clear()
+        event.accept()
 
