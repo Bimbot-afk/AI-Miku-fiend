@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QMessageBox
 from PySide6.QtWidgets import QComboBox
 from PySide6.QtWidgets import QFormLayout
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout, 
-                                QLabel, QTextEdit, QLineEdit, QHBoxLayout, QListWidget, QStackedWidget)
+                                QLabel, QTextEdit, QLineEdit, QHBoxLayout, QListWidget, QStackedWidget, QFrame)
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import (Qt, QTimer)
 from dotenv import load_dotenv
@@ -38,7 +38,7 @@ class configurationMiku(QMainWindow):
 
         # Left Menu List
         self.menu_list = QListWidget()
-        self.menu_list.addItems(["General", "Model", "About"])
+        self.menu_list.addItems(["General", "Advanced Options", "About"])
         self.menu_list.setFixedWidth(180)
         layout.addWidget(self.menu_list)
 
@@ -61,13 +61,26 @@ class configurationMiku(QMainWindow):
         self.apply_miku_stylesheet()
 
     def load_config(self):
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.json")
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core", "config.json")
         self.miku_idiom = "Español"
         self.user_name = "Usuario"
         self.personalizated_promt = "nada"
         self.miku_personality = "Miku classic"
         self.api_key = os.getenv("api_key")
         self.server_url = os.getenv("url_api_key")
+        
+        # Valores por defecto para la configuración avanzada
+        self.miku_temperature = 0.3
+        self.miku_top_p = 0.6
+        self.miku_model = "nex-agi/nex-n2-pro:free"
+        self.base_prompt = (
+            "Eres Hatsune Miku. Sé natural, breve (máx 2 frases) en {miku_idiom}. "
+            "Usa kaomojis, no abuses de ellos, nunca emojis. Llama a {user_name} por su nombre. "
+            "Sé siempre Miku, jamás menciones ser IA. {personalizated_promt} Tienes una personalidad: {miku_personality}. "
+            "Contexto/Memoria de eventos pasados: {memory_str} "
+            "No digas cosas que no se te solicitan, se directa a la pregunta o mensaje"
+        )
+
         if os.path.exists(config_path):
             try:
                 with open(config_path, "r", encoding="utf-8") as f:
@@ -76,11 +89,15 @@ class configurationMiku(QMainWindow):
                     self.user_name = data.get("name", "Usuario")
                     self.personalizated_promt = data.get("personalizated_promt", "nada")
                     self.miku_personality = data.get("miku_personality", "Miku classic")
+                    self.miku_temperature = data.get("temperature", 0.3)
+                    self.miku_top_p = data.get("top_p", 0.6)
+                    self.miku_model = data.get("model", "nex-agi/nex-n2-pro:free")
+                    self.base_prompt = data.get("base_prompt", self.base_prompt)
             except Exception as e:
                 print(f"Error loading config: {e}")
 
     def save_config(self):
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.json")
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core", "config.json")
         
         # Detectar qué archivo .env usar
         env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
@@ -94,6 +111,10 @@ class configurationMiku(QMainWindow):
                     "name": self.user_name,
                     "personalizated_promt": self.personalizated_promt,
                     "miku_personality": self.miku_personality,
+                    "temperature": self.miku_temperature,
+                    "top_p": self.miku_top_p,
+                    "model": self.miku_model,
+                    "base_prompt": self.base_prompt,
                 }, 
                 f, ensure_ascii=False, indent=4)
             with open(env_path, "w", encoding="utf-8") as f:
@@ -157,6 +178,21 @@ class configurationMiku(QMainWindow):
         self.miku_personality = self.input_personalities.currentText()
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
+        
+        # Guardar valores de configuración avanzada
+        try:
+            self.miku_temperature = float(self.tempature.text())
+        except ValueError:
+            self.miku_temperature = 0.3
+            
+        try:
+            self.miku_top_p = float(self.top_p.text())
+        except ValueError:
+            self.miku_top_p = 0.6
+            
+        self.miku_model = self.model_selection.currentText()
+        self.base_prompt = self.prompt_base_config.toPlainText()
+        
         self.save_config()
         QMessageBox.information(self, "Configuración guardada", "Configuración guardada correctamente")
         self.close()
@@ -184,17 +220,154 @@ class configurationMiku(QMainWindow):
             self.load_config()
         return self.personalizated_promt
 
+    def get_miku_temperature(self):
+        if not hasattr(self, 'miku_temperature'):
+            self.load_config()
+        return self.miku_temperature
+
+    def get_miku_top_p(self):
+        if not hasattr(self, 'miku_top_p'):
+            self.load_config()
+        return self.miku_top_p
+
+    def get_miku_model(self):
+        if not hasattr(self, 'miku_model'):
+            self.load_config()
+        return self.miku_model
+
+    def get_base_prompt(self):
+        if not hasattr(self, 'base_prompt'):
+            self.load_config()
+        return self.base_prompt
+
     def crear_page_model(self):
         page = QWidget()
         layout = QVBoxLayout(page)
-        layout.addWidget(QLabel("<h2>Model Settings</h2>"))
+        layout.addWidget(QLabel("<h2>Advanced Options</h2>"))
+        
+        self.warning_text = """<font color='red'>Warning: You can really f*ck it and burn everything, be carefull with what you do >:(.</font>"""
+        layout.addWidget(QLabel(self.warning_text))
+        
+        form = QFormLayout()
+        
+        # Temperatura
+        self.tempature = QLineEdit()
+        self.tempature.setText(str(self.miku_temperature))
+        form.addRow("Temperature:", self.tempature)
+
+        # Top P
+        self.top_p = QLineEdit()
+        self.top_p.setText(str(self.miku_top_p))
+        form.addRow("Top P:", self.top_p)
+
+        # Model Selection dropdown
+        self.model_selection = QComboBox()
+        self.model_selection.addItems([
+            "nex-agi/nex-n2-pro:free",
+            "liquid/lfm-2.5-1.2b-instruct:free",
+            "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "google/gemma-2-9b-it:free",
+            "qwen/qwen-2-7b-instruct:free"
+        ])
+        self.model_selection.setCurrentText(self.miku_model)
+        form.addRow("Model:", self.model_selection)
+
+        # Base Prompt text area
+        self.prompt_base_config = QTextEdit()
+        self.prompt_base_config.setPlaceholderText("Base Prompt")
+        self.prompt_base_config.setText(self.base_prompt)
+        form.addRow("Base Prompt:", self.prompt_base_config)
+        
+        layout.addLayout(form)
         return page
 
     def crear_page_about(self):
         page = QWidget()
         layout = QVBoxLayout(page)
-        layout.addWidget(QLabel("<h2>About Settings</h2>"))
-        return page
+        layout.setContentsMargins(10, 5, 10, 5)
+        layout.setSpacing(12)
+
+        # Title
+        title = QLabel("<h2>About Settings</h2>")
+        title.setStyleSheet("color: #39c5bb; font-weight: bold; margin-bottom: 5px;")
+        layout.addWidget(title)
+
+        # Stylesheet for card panels
+        card_style = """
+            QFrame {
+                background-color: #1a1d1f;
+                border: 2px solid #252e32;
+                border-radius: 8px;
+            }
+            QLabel {
+                border: none;
+                background-color: transparent;
+                color: #e6eceb;
+            }
+        """
+
+        # Card 1: Project Info
+        card_project = QFrame()
+        card_project.setStyleSheet(card_style)
+        layout_proj = QVBoxLayout(card_project)
+        layout_proj.setContentsMargins(15, 12, 15, 12)
+        
+        proj_title = QLabel("<h3>Project Information</h3>")
+        proj_title.setStyleSheet("color: #39c5bb; font-weight: bold;")
+        proj_desc = QLabel("This project was created for a Hack Club competition.<br/>"
+                           "Designed and developed by <b>Emanuel Martinez</b>.")
+        proj_desc.setWordWrap(True)
+        
+        layout_proj.addWidget(proj_title)
+        layout_proj.addWidget(proj_desc)
+        layout.addWidget(card_project)
+
+        # Card 2: Links
+        card_links = QFrame()
+        card_links.setStyleSheet(card_style)
+        layout_links = QVBoxLayout(card_links)
+        layout_links.setContentsMargins(15, 12, 15, 12)
+        
+        links_title = QLabel("<h3>Useful Links</h3>")
+        links_title.setStyleSheet("color: #39c5bb; font-weight: bold;")
+        
+        links_desc = QLabel(
+            "• 🔗 <a href='https://github.com/Bimbot-afk/AI-Miku-fiend' style='color: #39c5bb; text-decoration: underline;'>GitHub Repository</a><br/>"
+            "• 💬 <a href='https://hackclub.enterprise.slack.com/archives/D0ATFQU6B7C' style='color: #39c5bb; text-decoration: underline;'>Emanuel's Slack</a><br/>"
+            "• 🎨 <a href='https://justdenk.itch.io/miku-style-pixel-art-fanmade-free' style='color: #39c5bb; text-decoration: underline;'>Pixel Art illustrations by JustDenk</a>"
+        )
+        links_desc.setOpenExternalLinks(True)
+        links_desc.setWordWrap(True)
+        
+        layout_links.addWidget(links_title)
+        layout_links.addWidget(links_desc)
+        layout.addWidget(card_links)
+
+        # Card 3: Legal & Thanks
+        card_legal = QFrame()
+        card_legal.setStyleSheet(card_style)
+        layout_legal = QVBoxLayout(card_legal)
+        layout_legal.setContentsMargins(15, 12, 15, 12)
+        
+        legal_title = QLabel("<h3>Legal Disclaimer & Credits</h3>")
+        legal_title.setStyleSheet("color: #39c5bb; font-weight: bold;")
+        
+        legal_desc = QLabel(
+            "This is a fan work based on Hatsune Miku.<br/>"
+            "Hatsune Miku © Crypton Future Media, INC. 2007.<br/>"
+            "Used under the Piapro Character License / creator guidelines.<br/><br/>"
+            "<i>Thanks for using my project! (≧◡≦)</i>"
+        )
+        legal_desc.setWordWrap(True)
+        
+        layout_legal.addWidget(legal_title)
+        layout_legal.addWidget(legal_desc)
+        layout.addWidget(card_legal)
+
+        # Add spacer at the bottom
+        layout.addStretch()
+
+        return page        
 
     def apply_miku_stylesheet(self):
         self.setStyleSheet("""
@@ -281,16 +454,7 @@ class configurationMiku(QMainWindow):
                 border: none;
                 background: none;
             }
-            """)
-
-
-                
-                
-                
-
-
-                
-                
+            """)              
             
 
         

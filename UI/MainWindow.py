@@ -4,6 +4,7 @@ from PySide6.QtCore import (QSize, Qt, QPoint)
 from PySide6.QtGui import (QImage, QPixmap, QIcon, QAction, QMovie)
 from UI.ChatbotWindowMiku import ChatbotWindowMiku
 from UI.configuration import configurationMiku
+from UI.miku_cmd import MikuCMD
 import ctypes
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
@@ -15,6 +16,7 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
         self.chat_open = None
+        self.cmd_window = None
         self.config_window = None
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.derecha_inferior_ventana = self.frameGeometry().bottomRight()
@@ -64,6 +66,7 @@ class MainWindow(QMainWindow):
         """)
 
         menu.addAction(QAction("Open Chat", self, triggered=self.open_chat))
+        menu.addAction(QAction("Open Command Line", self, triggered=self.open_command_line))
         menu.addAction(QAction("Configuration", self, triggered=self.open_configuration))
         menu.addAction(QAction("Exit", self, triggered=self.close))
         menu.exec(self.mapToGlobal(pos))
@@ -75,6 +78,14 @@ class MainWindow(QMainWindow):
         self.chat_open.show()
         self.chat_open.raise_()
         self.chat_open.activateWindow()
+
+    def open_command_line(self):
+        if self.cmd_window is None:
+            self.cmd_window = MikuCMD(self)
+
+        self.cmd_window.show()
+        self.cmd_window.raise_()
+        self.cmd_window.activateWindow()
 
     def open_configuration(self):
         if self.config_window is None:
