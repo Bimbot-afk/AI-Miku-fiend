@@ -19,6 +19,7 @@ class MikuCMD(QMainWindow):
         # Historial de chat y comando activo
         self.miku_comand = ""
         self.brain = cmd_brain.Brain_cmd()
+        self.active_workers = []
 
         # Central Widget
         main_widget = QWidget()
@@ -81,14 +82,28 @@ class MikuCMD(QMainWindow):
         else:
             super().keyPressEvent(event)
 
+    def append_log(self, text):
+        formatted = text
+        if text.startswith("[SYSTEM]"):
+            formatted = f"<span style='color: #ffb86c;'><b>{text}</b></span>"
+        elif text.startswith("[OLLAMA]"):
+            formatted = f"<span style='color: #8be9fd;'><b>{text}</b></span>"
+        elif text.startswith("[WEB API]"):
+            formatted = f"<span style='color: #ff79c6;'><b>{text}</b></span>"
+        elif text.startswith("[COMMAND]"):
+            formatted = f"<span style='color: #50fa7b;'><b>{text}</b></span>"
+        
+        self.chat_history.append(formatted)
+
     def comand_read(self):
-        if self.miku_comand.startswith("/"):
-            if self.miku_comand == "/save":
+        cmd_lower = self.miku_comand.strip().lower()
+        if cmd_lower.startswith("/"):
+            if cmd_lower.startswith("/save"):
                 response = self.brain.decide_comand(self.miku_comand)
                 self.chat_history.append(f"<b>Miku_sys:</b> {response}")
-            elif self.miku_comand == "/help":
-                self.chat_history.append("<b>System:</b> Commands: /talk, /exit, /help")
-            elif self.miku_comand == "/exit":
+            elif cmd_lower == "/help":
+                self.chat_history.append("<b>System:</b> Commands: /save &lt;text&gt;, /exit, /help")
+            elif cmd_lower == "/exit":
                 self.close()
             else:
                 self.chat_history.append("Unknown command. Type /help to see the list of commands")

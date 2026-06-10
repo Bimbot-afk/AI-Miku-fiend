@@ -4,13 +4,17 @@ from UI.configuration import configurationMiku
 import core.cmd_brain as cmd_brain
 import json
 import os
+import ollama
 from openrouter import OpenRouter
 from dotenv import load_dotenv
+
 
 
 class consultar_miku(QThread):
     # La señal que enviará la respuesta de vuelta a la UI
     finished_response = Signal(str)
+    # Señal para enviar logs a la consola de la UI
+    log_signal = Signal(str)
 
     def __init__(self, message_history, long_term_memory_list):
         super().__init__()
@@ -18,12 +22,20 @@ class consultar_miku(QThread):
         # Usamos una referencia a la lista de la UI para que persista
         self.long_term_memory = long_term_memory_list 
         self.message_history_short = []
+        self.miku_local_brain = "phi3:3.8b"
+
+        self.list_commands = [
+            "/Save",
+            "/Read"
+        ]
 
         self.question_y_n = (
-        "Nesecitas un comando de la siguiente lista? responde solo if yes 'SI' if no answer 'NO' IF 'SI' cual:"
-        "/Save (You save something important that should be remembered for the future)"
+            "Nesecitas un comando de la siguiente lista? responde SOLO Y SOLO if yes 'SI' if no answer 'NO' IF 'SI' cual:\n"
+            "NO RESPONDAS NADA MAS, SOLO EL COMANDO Y ARGUMENTO\n"
+            "/Save you have 3 options: soul(tu nucleo solo tocalo cuando sea estrictamente necesario para no romperte), memory(informacion relevante del momento para recordar en el futuro), session(conversation actual),\n"
+            "/Read you have 3 options: soul(tu nucleo solo tocalo cuando sea estrictamente necesario para no romperte), memory(informacion relevante del momento para recordar en el futuro), session(conversation actual),"
         )
-
+ 
     def update_long_memory(self):
         # Solo resumimos si el historial creció y tenemos suficiente contexto
         if len(self.message_history) >= 5:
@@ -52,35 +64,21 @@ class consultar_miku(QThread):
         self.message_history_short = self.message_history[-5:]
 
     def miku_config(self):
-        self.miku_idiom = "Español"
-        self.user_name = "Usuario"
-        self.miku_personality = "Miku classic"
-        self.personalizated_promt = ""
-        self.miku_temperature = 0.3
-        self.miku_top_p = 0.6
-        self.miku_model = "nex-agi/nex-n2-pro:free"
-        self.base_prompt = (
-            "Eres Hatsune Miku. Sé natural, breve (máx 2 frases) en {miku_idiom}. "
-            "Usa kaomojis, no abuses de ellos, nunca emojis. Llama a {user_name} por su nombre. "
-            "Sé siempre Miku, jamás menciones ser IA. {personalizated_promt} Tienes una personalidad: {miku_personality}. "
-            "Contexto/Memoria de eventos pasados: {memory_str} "
-            "No digas cosas que no se te solicitan, se directa a la pregunta o mensaje"
-        )
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.miku_idiom = data.get("idiom", "Español")
-                    self.user_name = data.get("name", "Usuario")
-                    self.personalizated_promt = data.get("personalizated_promt", "")
-                    self.miku_personality = data.get("miku_personality", "Miku classic")
-                    self.miku_temperature = data.get("temperature", 0.3)
-                    self.miku_top_p = data.get("top_p", 0.6)
-                    self.miku_model = data.get("model", "nex-agi/nex-n2-pro:free")
-                    self.base_prompt = data.get("base_prompt", self.base_prompt)
-            except Exception as e:
-                print(f"Error loading config: {e}")
+        from core.miku_config_manager import load_soul_prompt, load_memory_data, load_model_config
+        
+        # Load from Markdown files and config.json
+        self.base_prompt = load_soul_prompt()
+        
+        memory_data = load_memory_data()
+        self.miku_idiom = memory_data.get("idiom", "Español")
+        self.user_name = memory_data.get("name", "Usuario")
+        self.personalizated_promt = memory_data.get("personalizated_promt", "")
+        self.miku_personality = memory_data.get("miku_personality", "Miku classic")
+        
+        model_config = load_model_config()
+        self.miku_temperature = model_config.get("temperature", 0.3)
+        self.miku_top_p = model_config.get("top_p", 0.6)
+        self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
 
     def clean_personality_input(self):
         if self.miku_personality == "Loli (wtf u doing bro?)":
@@ -112,6 +110,8 @@ class consultar_miku(QThread):
     def run(self):
         # 1. Cargar variables de entorno y crear cliente
         self.load_env()
+        #1.1 que nivel de memoria se va a usar
+        self.memory_level = ""
         # 2. Cargar configuración de Miku
         self.miku_config()
         self.clean_personality_input()
@@ -121,25 +121,91 @@ class consultar_miku(QThread):
         # 4. Enviar prompt (primero respondemos para no hacer esperar al usuario)
         full_messages = [{'role': 'system', 'content': self.base_miku_base_prompt()}] + self.message_history_short
 
+        # Obtener el último mensaje del usuario como cadena de texto y limpiar variables
+        message_to_ollama = ""
+        for msg in reversed(self.message_history):
+            if msg.get('role') == 'user':
+                message_to_ollama = msg.get('content', '')
+                break
+
         # 4.1 needs a comand?
+        cmd_content = "NO"
+        system_prompt = (
+            "Determine if the user's last message requires executing a command from the list below.\n\n"
+            "Available commands:\n"
+            "- /Save soul (e.g., 'save in your soul...', 'update your core...')\n"
+            "- /Save memory (e.g., 'remember that...', 'save that my dog is named...')\n"
+            "- /Save session (e.g., 'save this chat...', 'save the session...')\n"
+            "- /Read soul\n"
+            "- /Read memory\n"
+            "- /Read session\n\n"
+            "Response rules:\n"
+            "- If it requires a command, respond EXACTLY in this format: YES <command> <argument> (e.g., YES /Save memory)\n"
+            "- If it DOES NOT require any command, respond only: NO\n"
+            "Do not include any explanation, greetings, or extra text."
+        )
+
         try:
-            response_cmd_needed = self.client.chat.send(
-                model="z-ai/glm-4.5-air:free",
-                messages=full_messages + [{"role": "user", "content": self.question_y_n}],
-                temperature=0.0,
-                top_p=1.0,
-                max_tokens=20,
+            log_msg = f"[OLLAMA] Checking command requirements using local model: {self.miku_local_brain}"
+            self.log_signal.emit(log_msg)
+            print(log_msg)
+
+            # Query local Ollama
+            response = ollama.chat(
+                model=self.miku_local_brain,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Mensaje del usuario: {message_to_ollama}"}
+                ],
+                options={
+                    "temperature": 0.0,
+                    "top_p": 1.0,
+                    "num_predict": 20
+                }
             )
-            msg_content = response_cmd_needed.choices[0].message.content
-            cmd_content = msg_content.strip() if msg_content is not None else "NO"
+            cmd_content = response['message']['content'].strip()
+            log_msg = f"[OLLAMA] Command decision: {cmd_content}"
+            self.log_signal.emit(log_msg)
+            print(log_msg)
         except Exception as e:
-            print(f"Error checking command needed: {e}")
-            cmd_content = "NO"
+            warn_msg = f"[SYSTEM] Ollama local call failed: {e}. Falling back to Web API."
+            self.log_signal.emit(warn_msg)
+            print(warn_msg)
+            
+            # Fallback to OpenRouter (Web API)
+            try:
+                fallback_model = "poolside/laguna-xs.2:free"
+                self.log_signal.emit(f"[WEB API] Checking command requirements using OpenRouter ({fallback_model})...")
+                print(f"[WEB API] Checking command requirements using OpenRouter ({fallback_model})...")
+                response_cmd_needed = self.client.chat.send(
+                    model=fallback_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"Mensaje del usuario: {message_to_ollama}"}
+                    ],
+                    temperature=0.0,
+                    top_p=1.0,
+                    max_tokens=20,
+                )
+                msg_content = response_cmd_needed.choices[0].message.content
+                cmd_content = msg_content.strip() if msg_content is not None else "NO"
+                log_msg = f"[WEB API] Command decision: {cmd_content}"
+                self.log_signal.emit(log_msg)
+                print(log_msg)
+            except Exception as ex:
+                err_msg = f"[SYSTEM] Web API fallback also failed: {ex}"
+                self.log_signal.emit(err_msg)
+                print(err_msg)
+                cmd_content = "NO"
         
         if self.client is None or self.client.sdk_configuration.client is None:
             self.load_env()
         
         try:
+            web_msg = f"[WEB API] Querying response from {self.miku_model}..."
+            self.log_signal.emit(web_msg)
+            print(web_msg)
+
             response = self.client.chat.send(
                 model=self.miku_model, 
                 messages=full_messages,
@@ -147,24 +213,69 @@ class consultar_miku(QThread):
                 top_p=self.miku_top_p
             )
             answer = response.choices[0].message.content
+
+            resp_msg = f"[WEB API] Miku response: {answer}"
+            self.log_signal.emit(resp_msg)
+            print(resp_msg)
         except Exception as e:
-            print(f"Error en el chat de Miku: {e}")
+            err_msg = f"[SYSTEM] Error in Miku chat: {e}"
+            self.log_signal.emit(err_msg)
+            print(err_msg)
             self.finished_response.emit("error")
             return
-
-        # Check command needed
-        if "SI" in cmd_content or "/Save" in cmd_content:
+        
+        def wich_level_of_memory(cmd_content):
+            cmd_lower = cmd_content.lower()
+            if "soul" in cmd_lower:
+                self.memory_level = "soul:"
+            elif "session" in cmd_lower:
+                self.memory_level = "session:"
+            else:
+                self.memory_level = "memory:"
+            return self.memory_level
+            
+        # Check /save
+        if "SI" in cmd_content or "YES" in cmd_content or "yes" in cmd_content or "/Save" in cmd_content or "/save" in cmd_content:
+            memory_level = wich_level_of_memory(cmd_content)
             try:
+                # Obtener el último mensaje del usuario para guardar como memoria
+                user_msg = ""
+                if self.message_history_short:
+                    for msg in reversed(self.message_history_short):
+                        if msg.get('role') == 'user':
+                            user_msg = msg.get('content', '')
+                            break
+                if not user_msg and self.message_history:
+                    for msg in reversed(self.message_history):
+                        if msg.get('role') == 'user':
+                            user_msg = msg.get('content', '')
+                            break
+
                 from tools import open_txt_file
-                open_txt_file.save_memory()
-                self.finished_response.emit("miku have saved the memory")
+                
+                if memory_level == "soul:":
+                    open_txt_file.save_soul(user_msg)
+                elif memory_level == "session:":
+                    open_txt_file.save_memory_session(user_msg)
+                elif memory_level == "memory:":
+                    open_txt_file.save_general_memorie(user_msg)
+                
+                log_msg = f"[COMMAND] /Save executed successfully. Saved text: '{user_msg}'"
+                self.log_signal.emit(log_msg)
+                print(log_msg)
+                self.finished_response.emit(answer)
             except Exception as e:
-                print(f"Error saving memory: {e}")
+                err_msg = f"[SYSTEM] Error saving memory: {e}"
+                self.log_signal.emit(err_msg)
+                print(err_msg)
                 self.finished_response.emit(answer)
         else:
             self.finished_response.emit(answer)
 
+        # Check /read
+        if "SI" in cmd_content and "/read"  in cmd_content:
+            pass
+
         # 5. Generar o actualizar la memoria a largo plazo en segundo plano.
-        # Solo lo hacemos si el historial tiene 5 o más mensajes, y solo una vez cada 5 mensajes.
         if len(self.message_history) >= 5 and len(self.message_history) % 5 == 0:
             self.update_long_memory()

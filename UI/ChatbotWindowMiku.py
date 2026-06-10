@@ -185,6 +185,8 @@ class ChatbotWindowMiku(QMainWindow):
             
         # Cargar la configuración en el hilo y conectar señales
         worker.miku_config()
+        if self.main_window.cmd_window is not None:
+            worker.log_signal.connect(self.main_window.cmd_window.append_log)
         worker.finished_response.connect(self.on_response_received)
         worker.finished.connect(lambda: self.cleanup_worker(worker))
         worker.start()

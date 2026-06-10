@@ -61,43 +61,27 @@ class configurationMiku(QMainWindow):
         self.apply_miku_stylesheet()
 
     def load_config(self):
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core", "config.json")
-        self.miku_idiom = "Español"
-        self.user_name = "Usuario"
-        self.personalizated_promt = "nada"
-        self.miku_personality = "Miku classic"
+        from core.miku_config_manager import load_soul_prompt, load_memory_data, load_model_config
+        
+        # Load from Markdown files and config.json
+        self.base_prompt = load_soul_prompt()
+        
+        memory_data = load_memory_data()
+        self.miku_idiom = memory_data.get("idiom", "Español")
+        self.user_name = memory_data.get("name", "Usuario")
+        self.personalizated_promt = memory_data.get("personalizated_promt", "")
+        self.miku_personality = memory_data.get("miku_personality", "Miku classic")
+        
+        model_config = load_model_config()
+        self.miku_temperature = model_config.get("temperature", 0.3)
+        self.miku_top_p = model_config.get("top_p", 0.6)
+        self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
+        
         self.api_key = os.getenv("api_key")
         self.server_url = os.getenv("url_api_key")
-        
-        # Valores por defecto para la configuración avanzada
-        self.miku_temperature = 0.3
-        self.miku_top_p = 0.6
-        self.miku_model = "nex-agi/nex-n2-pro:free"
-        self.base_prompt = (
-            "Eres Hatsune Miku. Sé natural, breve (máx 2 frases) en {miku_idiom}. "
-            "Usa kaomojis, no abuses de ellos, nunca emojis. Llama a {user_name} por su nombre. "
-            "Sé siempre Miku, jamás menciones ser IA. {personalizated_promt} Tienes una personalidad: {miku_personality}. "
-            "Contexto/Memoria de eventos pasados: {memory_str} "
-            "No digas cosas que no se te solicitan, se directa a la pregunta o mensaje"
-        )
-
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.miku_idiom = data.get("idiom", "Español")
-                    self.user_name = data.get("name", "Usuario")
-                    self.personalizated_promt = data.get("personalizated_promt", "nada")
-                    self.miku_personality = data.get("miku_personality", "Miku classic")
-                    self.miku_temperature = data.get("temperature", 0.3)
-                    self.miku_top_p = data.get("top_p", 0.6)
-                    self.miku_model = data.get("model", "nex-agi/nex-n2-pro:free")
-                    self.base_prompt = data.get("base_prompt", self.base_prompt)
-            except Exception as e:
-                print(f"Error loading config: {e}")
 
     def save_config(self):
-        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "core", "config.json")
+        from core.miku_config_manager import save_soul_prompt, save_memory_data, save_model_config
         
         # Detectar qué archivo .env usar
         env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
@@ -105,18 +89,22 @@ class configurationMiku(QMainWindow):
         env_path = env_in_folder if os.path.exists(env_in_folder) else env_in_root
 
         try:
-            with open(config_path, "w", encoding="utf-8") as f:
-                json.dump({
-                    "idiom": self.miku_idiom,
-                    "name": self.user_name,
-                    "personalizated_promt": self.personalizated_promt,
-                    "miku_personality": self.miku_personality,
-                    "temperature": self.miku_temperature,
-                    "top_p": self.miku_top_p,
-                    "model": self.miku_model,
-                    "base_prompt": self.base_prompt,
-                }, 
-                f, ensure_ascii=False, indent=4)
+            # Save configuration to respective markdown files and JSON config
+            save_soul_prompt(self.base_prompt)
+            
+            save_memory_data({
+                "name": self.user_name,
+                "idiom": self.miku_idiom,
+                "personalizated_promt": self.personalizated_promt,
+                "miku_personality": self.miku_personality
+            })
+            
+            save_model_config({
+                "model": self.miku_model,
+                "temperature": self.miku_temperature,
+                "top_p": self.miku_top_p
+            })
+            
             with open(env_path, "w", encoding="utf-8") as f:
                 f.write(f"api_key={self.api_key}\n")
                 f.write(f"url_api_key={self.server_url}\n")
