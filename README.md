@@ -39,7 +39,7 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 ---
 
 ## 🖥️ Vista Previa
-![Miku Friend Preview](assets/miku_friend_preview.png)
+![Miku Friend Preview](https://i.ibb.co/prdw3QZW/EXAMPLE.png)
 
 ---
 
