@@ -26,12 +26,17 @@ def save_general_memorie(text=""):
         cleaned_text = text.strip()
         if cleaned_text:
             from core.miku_config_manager import load_memory_data, save_memory_data
-            # Load existing memory keys and list, append to general memories, and write it back
-            mem_data = load_memory_data()
-            if "general_memories" not in mem_data:
-                mem_data["general_memories"] = []
-            mem_data["general_memories"].append(cleaned_text)
-            save_memory_data(mem_data)
+            from datetime import datetime
+            import re
+
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            if not re.match(r'^\**\[\d{4}-\d{2}-\d{2}]', cleaned_text):
+                cleaned_text = f"**[{current_date}]**: {cleaned_text}"
+
+            # Load existing memories list, append the new one, and write it back
+            memories_list = load_memory_data()
+            memories_list.append(cleaned_text)
+            save_memory_data(memories_list)
 
 def save_soul(text=""):
     if not os.path.exists(FOLDER):
