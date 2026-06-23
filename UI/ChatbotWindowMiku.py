@@ -57,7 +57,7 @@ class ChatbotWindowMiku(QMainWindow):
         
         self.layout.addLayout(self.input_layout)
 
-        # Inicializar el historial de conversación para Ollama
+        # Inicializar el historial de conversación
         self.message_history = []
         self.long_term_memory = []
         self.active_workers = []

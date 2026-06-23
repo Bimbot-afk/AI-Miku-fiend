@@ -61,27 +61,28 @@ class configurationMiku(QMainWindow):
         self.apply_miku_stylesheet()
 
     def load_config(self):
-        from core.miku_config_manager import load_soul_prompt, load_memory_data, load_model_config
+        from core.miku_config_manager import load_soul_prompt, load_soul_data, load_model_config
         
         # Load from Markdown files and config.json
         self.base_prompt = load_soul_prompt()
         
-        memory_data = load_memory_data()
-        self.miku_idiom = memory_data.get("idiom", "Español")
-        self.user_name = memory_data.get("name", "Usuario")
-        self.personalizated_promt = memory_data.get("personalizated_promt", "")
-        self.miku_personality = memory_data.get("miku_personality", "Miku classic")
+        soul_data = load_soul_data()
+        self.miku_idiom = soul_data.get("idiom", "Español")
+        self.user_name = soul_data.get("name", "Usuario")
+        self.personalizated_promt = soul_data.get("personalizated_promt", "")
+        self.miku_personality = soul_data.get("miku_personality", "Miku classic")
         
         model_config = load_model_config()
         self.miku_temperature = model_config.get("temperature", 0.3)
         self.miku_top_p = model_config.get("top_p", 0.6)
         self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
+        self.secondary_model_name = model_config.get("secondary_model", "nex-agi/nex-n2-pro:free")
         
         self.api_key = os.getenv("api_key")
         self.server_url = os.getenv("url_api_key")
 
     def save_config(self):
-        from core.miku_config_manager import save_soul_prompt, save_memory_data, save_model_config
+        from core.miku_config_manager import save_soul_prompt, save_soul_data, save_model_config
         
         # Detectar qué archivo .env usar
         env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
@@ -92,7 +93,7 @@ class configurationMiku(QMainWindow):
             # Save configuration to respective markdown files and JSON config
             save_soul_prompt(self.base_prompt)
             
-            save_memory_data({
+            save_soul_data({
                 "name": self.user_name,
                 "idiom": self.miku_idiom,
                 "personalizated_promt": self.personalizated_promt,
@@ -102,7 +103,8 @@ class configurationMiku(QMainWindow):
             save_model_config({
                 "model": self.miku_model,
                 "temperature": self.miku_temperature,
-                "top_p": self.miku_top_p
+                "top_p": self.miku_top_p,
+                "secondary_model": self.secondary_model_name
             })
             
             with open(env_path, "w", encoding="utf-8") as f:
@@ -150,7 +152,7 @@ class configurationMiku(QMainWindow):
         layout.addLayout(form)
 
         self.button_guardar = QPushButton("Guardar")
-        self.button_guardar.clicked.connect(self.guardar_configuracion,)
+        self.button_guardar.clicked.connect(self.guardar_configuracion)
         layout.addWidget(self.button_guardar)    
 
         self.button_salir = QPushButton("Salir")
@@ -166,6 +168,7 @@ class configurationMiku(QMainWindow):
         self.miku_personality = self.input_personalities.currentText()
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
+        self.secondary_model_name = self.secondary_model_selection.text()
         
         # Guardar valores de configuración avanzada
         try:
@@ -178,7 +181,7 @@ class configurationMiku(QMainWindow):
         except ValueError:
             self.miku_top_p = 0.6
             
-        self.miku_model = self.model_selection.currentText()
+        self.miku_model = self.model_selection.text()
         self.base_prompt = self.prompt_base_config.toPlainText()
         
         self.save_config()
@@ -228,6 +231,11 @@ class configurationMiku(QMainWindow):
             self.load_config()
         return self.base_prompt
 
+    def get_secondary_model_name(self):
+        if not hasattr(self, 'secondary_model_name'):
+            self.load_config()
+        return self.secondary_model_name
+
     def crear_page_model(self):
         page = QWidget()
         layout = QVBoxLayout(page)
@@ -248,17 +256,15 @@ class configurationMiku(QMainWindow):
         self.top_p.setText(str(self.miku_top_p))
         form.addRow("Top P:", self.top_p)
 
-        # Model Selection dropdown
-        self.model_selection = QComboBox()
-        self.model_selection.addItems([
-            "nex-agi/nex-n2-pro:free",
-            "liquid/lfm-2.5-1.2b-instruct:free",
-            "nvidia/nemotron-3-ultra-550b-a55b:free",
-            "google/gemma-2-9b-it:free",
-            "qwen/qwen-2-7b-instruct:free"
-        ])
-        self.model_selection.setCurrentText(self.miku_model)
+        # Model Selection
+        self.model_selection = QLineEdit()
+        self.model_selection.setText(self.miku_model)
         form.addRow("Model:", self.model_selection)
+
+        # Secondary Model Selection
+        self.secondary_model_selection = QLineEdit()
+        self.secondary_model_selection.setText(self.secondary_model_name)
+        form.addRow("Secondary Model:", self.secondary_model_selection)
 
         # Base Prompt text area
         self.prompt_base_config = QTextEdit()

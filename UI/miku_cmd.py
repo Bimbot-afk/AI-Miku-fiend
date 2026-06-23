@@ -86,8 +86,6 @@ class MikuCMD(QMainWindow):
         formatted = text
         if text.startswith("[SYSTEM]"):
             formatted = f"<span style='color: #ffb86c;'><b>{text}</b></span>"
-        elif text.startswith("[OLLAMA]"):
-            formatted = f"<span style='color: #8be9fd;'><b>{text}</b></span>"
         elif text.startswith("[WEB API]"):
             formatted = f"<span style='color: #ff79c6;'><b>{text}</b></span>"
         elif text.startswith("[COMMAND]"):
@@ -101,10 +99,21 @@ class MikuCMD(QMainWindow):
             if cmd_lower.startswith("/save"):
                 response = self.brain.decide_comand(self.miku_comand)
                 self.chat_history.append(f"<b>Miku_sys:</b> {response}")
+
+            elif cmd_lower.startswith("/read"):
+                response = self.brain.decide_comand(self.miku_comand)
+                self.chat_history.append(f"<b>Miku_sys:</b> {response}")
+
+            elif cmd_lower.startswith("/web_search"):
+                response = self.brain.decide_comand(self.miku_comand)
+                self.chat_history.append(f"<b>Miku_sys:</b> {response}")
+
             elif cmd_lower == "/help":
                 self.chat_history.append("<b>System:</b> Commands: /save &lt;text&gt;, /exit, /help")
+
             elif cmd_lower == "/exit":
                 self.close()
+
             else:
                 self.chat_history.append("Unknown command. Type /help to see the list of commands")
 
