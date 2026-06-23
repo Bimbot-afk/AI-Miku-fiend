@@ -14,7 +14,7 @@
 [![UI Framework](https://img.shields.io/badge/UI-PySide6--Qt6-39c5bb?style=flat-svg&logo=qt&logoColor=white)](https://wiki.qt.io/Qt_for_Python)
 [![License](https://img.shields.io/badge/license-MIT-39c5bb?style=flat-svg)](LICENSE)
 
-Un asistente de inteligencia artificial de escritorio con interfaz gráfica interactiva, inspirado en **Hatsune Miku**. Combina IA local (con Ollama) e IA web (OpenRouter) para responder y gestionar recuerdos sobre ti de forma persistente y natural.
+Un asistente de inteligencia artificial de escritorio con interfaz gráfica interactiva, inspirado en **Hatsune Miku**. Utiliza las APIs de OpenRouter para responder y gestionar recuerdos sobre ti de forma persistente y natural.
 
 ---
 
@@ -32,9 +32,11 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 ## ✨ Características principales
 * **Personalidad de Hatsune Miku**: Diseñada para actuar como Miku usando respuestas naturales, breves y kaomojis `(◕‿◕✿)`.
-* **Memoria a Largo Plazo**: Estructura de persistencia basada en Markdown (`miku_memory.md` para tus gustos y `miku_soul.md` para su personalidad).
+* **Doble Modelo Inteligente (Ahorro de Costos)**: Permite configurar un modelo principal (Premium) para las conversaciones y un modelo secundario (Gratuito/Rápido) para procesos en segundo plano como resúmenes de memoria.
+* **Agente Autónomo (Tools Loop)**: Miku "piensa" y utiliza herramientas dinámicamente antes de responderte. Puede leer archivos, buscar en internet o inyectar imágenes mediante comandos como `output[WebSearch...]`.
+* **Memoria a Largo y Corto Plazo**: Estructura de compresión automática de contexto. Reduce historiales largos a resúmenes sólidos y persistentes basados en Markdown (`miku_memory.md` para gustos y `miku_soul.md` para personalidad).
+* **Búsqueda Web Integrada**: Usa `ddgs` (DuckDuckGo) para buscar en la web en tiempo real, procesar la información de internet y usarla para responder preguntas sobre temas de actualidad o datos desconocidos.
 * **Consola de Comando**: Modo CMD interactivo para administrar su alma, guardar sesiones y revisar logs del sistema en tiempo real.
-* **Modelo Híbrido**: Clasificación inteligente y local mediante **Ollama** y generación rápida mediante APIs de **OpenRouter**.
 
 ---
 
@@ -45,7 +47,6 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 ## ⚙️ Requisitos de Sistema
 * **Python 3.10** o superior.
-* **Ollama** instalado y corriendo localmente (para clasificación y toma de decisiones).
 * Conexión a Internet (para consultas OpenRouter).
 
 ---
@@ -60,16 +61,10 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 2. **Instala las dependencias**:
    ```bash
-   pip install PySide6 ollama python-dotenv openrouter
+   pip install PySide6 python-dotenv openrouter ddgs
    ```
 
-3. **Descarga el modelo local en Ollama**:
-   Asegúrate de tener Ollama corriendo y descarga el modelo por defecto:
-   ```bash
-   ollama pull phi3:3.8b
-   ```
-
-4. **Configura tus credenciales (.env)**:
+3. **Configura tus credenciales (.env)**:
    Crea un archivo `.env` en la raíz del proyecto (o edita el de la carpeta `env/`) con tu API Key de OpenRouter:
    ```env
    api_key=TU_OPENROUTER_API_KEY
@@ -95,13 +90,16 @@ Puedes usar comandos en la consola integrada para gestionar la memoria de Miku d
 * `/save soul <texto>`: Anexa instrucciones de personalidad directamente al prompt base en `miku_soul.md`.
 * `/save memory <texto>`: Agrega un recuerdo general sobre ti (gustos, eventos pasados) en `miku_memory.md`.
 * `/save session <texto>`: Registra notas y registros de la sesión de chat activa en `miku.md`.
+* `/web_search <texto>`: (O mediante el uso autónomo de Miku). Permite al agente buscar información en línea, condensarla y responder basado en esos datos.
+* `/read <palabras clave>`: Busca dentro de la memoria general del usuario.
+* `/happymiku`: Inyecta automáticamente imágenes de gatitos para alegrarte si nota que estás triste.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 * **Lenguaje**: Python 🐍
 * **Interfaz de Usuario**: PySide6 (Qt para Python) 🎨
-* **Procesamiento de Lenguaje**: Ollama (Local) & OpenRouter API (Nube) 🧠
+* **Procesamiento de Lenguaje**: OpenRouter API (Nube) 🧠
 * **Almacenamiento**: Markdown (.md) y JSON (.json) 📄
 
 ---
