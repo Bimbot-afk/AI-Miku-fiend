@@ -1,12 +1,12 @@
 <div align="center">
 
 # 🧪 [ VERSIÓN BETA ] 🧪
-### *Desarrollo Activo e Implementación de Memoria Markdown*
+### *Desarrollo e implementacion de API y lectura de notificaciones*
 
 ***
 </div>
 
-# 🌐 Miku Friend AI 🌐
+# Miku Friend AI 
 
 ![Miku Friend Logo](https://i.ibb.co/BVzfJ5cS/MIKU.png)
 
@@ -18,19 +18,19 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 ---
 
-## 🗺️ Tabla de Contenidos
-- [✨ Características principales](#-características-principales)
-- [🖥️ Vista Previa](#-vista-previa)
-- [⚙️ Requisitos de Sistema](#%EF%B8%8F-requisitos-de-sistema)
-- [🚀 Instalación](#-instalación)
-- [🛠️ Uso](#%EF%B8%8F-uso)
-- [🛠️ Tecnologías Utilizadas](#%EF%B8%8F-tecnologías-utilizadas)
-- [🤝 Contribución](#-contribución)
-- [📄 Licencia](#-licencia)
+## Tabla de Contenidos
+- [Características principales](#-características-principales)
+- [Vista Previa](#-vista-previa)
+- [Requisitos de Sistema](#%EF%B8%8F-requisitos-de-sistema)
+- [Instalación](#-instalación)
+- [Uso](#%EF%B8%8F-uso)
+- [Tecnologías Utilizadas](#%EF%B8%8F-tecnologías-utilizadas)
+- [Contribución](#-contribución)
+- [Licencia](#-licencia)
 
 ---
 
-## ✨ Características principales
+## Características principales
 * **Personalidad de Hatsune Miku**: Diseñada para actuar como Miku usando respuestas naturales, breves y kaomojis `(◕‿◕✿)`.
 * **Doble Modelo Inteligente (Ahorro de Costos)**: Permite configurar un modelo principal (Premium) para las conversaciones y un modelo secundario (Gratuito/Rápido) para procesos en segundo plano como resúmenes de memoria.
 * **Agente Autónomo (Tools Loop)**: Miku "piensa" y utiliza herramientas dinámicamente antes de responderte. Puede leer archivos, buscar en internet o inyectar imágenes mediante comandos como `output[WebSearch...]`.
@@ -40,18 +40,18 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 ---
 
-## 🖥️ Vista Previa
+## Vista Previa
 ![Miku Friend Preview](https://i.ibb.co/prdw3QZW/EXAMPLE.png)
 
 ---
 
-## ⚙️ Requisitos de Sistema
+## Requisitos de Sistema
 * **Python 3.10** o superior.
 * Conexión a Internet (para consultas OpenRouter).
 
 ---
 
-## 🚀 Instalación
+## Instalación
 
 1. **Clona este repositorio**:
    ```bash
@@ -78,7 +78,7 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 
 ---
 
-## 🛠️ Uso
+## Uso
 
 ### Interfaz de Chat
 * **Enviar mensajes**: Escribe en el campo de texto y haz clic en **Send** o presiona `Enter`.
@@ -96,7 +96,7 @@ Puedes usar comandos en la consola integrada para gestionar la memoria de Miku d
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 * **Lenguaje**: Python 🐍
 * **Interfaz de Usuario**: PySide6 (Qt para Python) 🎨
 * **Procesamiento de Lenguaje**: OpenRouter API (Nube) 🧠
@@ -104,7 +104,7 @@ Puedes usar comandos en la consola integrada para gestionar la memoria de Miku d
 
 ---
 
-## 🤝 Contribución
+## Contribución
 Las contribuciones son bienvenidas. Si deseas colaborar:
 1. Haz un **Fork** de este repositorio.
 2. Crea una rama para tu feature (`git checkout -b feature/NuevaMejora`).
@@ -113,7 +113,7 @@ Las contribuciones son bienvenidas. Si deseas colaborar:
 
 ---
 
-## 📄 Licencia
+## Licencia
 Este proyecto es un trabajo de fans basado en Hatsune Miku y se distribuye bajo la licencia **MIT**. 
 
 *Hatsune Miku © Crypton Future Media, INC. 2007. Usado bajo las guías de piapro y uso de personajes sin fines de lucro.*
