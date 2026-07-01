@@ -1,3 +1,4 @@
+from tools.read_memory import read_soul
 from PySide6.QtCore import QThread, Signal
 import re
 import os
@@ -345,25 +346,76 @@ class consultar_miku(QThread):
                             continue
                             
                         elif cmd == "read":
-                            from core.miku_config_manager import load_memory_data
-                            log_msg = f"[COMMAND] Inline READ executed. Searching: '{text}'"
-                            self.log_signal.emit(log_msg)
-                            print(log_msg)
-                            
-                            all_memories = load_memory_data()
-                            found_memories = []
-                            if text:
-                                keywords = text.lower().split()
-                                for mem in all_memories:
-                                    if any(kw in mem.lower() for kw in keywords):
-                                        found_memories.append(mem)
-                            else:
-                                found_memories = all_memories
+                            from tools import read_memory
+                            if arg == "music":
+                                from tools import music_listener
+                                log_msg = f"[COMMAND] Inline READ executed. Reading music info"
+                                self.log_signal.emit(log_msg)
+                                print(log_msg)
+                                
+                                music_info = music_listener.read_music_info_wrapper()
+                                result_text = music_info if music_info else "No se está reproduciendo ninguna música en este momento."
+                                
+                                message_to_AI.append({"role": "assistant", "content": answer})
+                                message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - MUSIC]:\n{result_text}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no hay música, díselo."})
+                                continue
+
+                            if arg == "soul":
+                                log_msg = f"[COMMAND] Inline READ executed. Reading soul info"
+                                self.log_signal.emit(log_msg)
+                                print(log_msg)
+                                
+                                soul_info = read_memory.read_soul()
+                                result_text = soul_info if soul_info else "No se ha guardado información del alma de Miku."
+                                
+                                message_to_AI.append({"role": "assistant", "content": answer})
+                                message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - SOUL]:\n{result_text}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no hay soul, díselo."})
+                                continue
+
+                            if arg == "memory":
+                                from core.miku_config_manager import load_memory_data
+                                log_msg = f"[COMMAND] Inline READ executed. Searching: '{text}'"
+                                self.log_signal.emit(log_msg)
+                                print(log_msg)
+                                
+                                all_memories = load_memory_data()
+                                found_memories = []
+                                if text:
+                                    keywords = text.lower().split()
+                                    for mem in all_memories:
+                                        if any(kw in mem.lower() for kw in keywords):
+                                            found_memories.append(mem)
+                                else:
+                                    found_memories = all_memories
                                 # Añadir la respuesta del asistente con el tool call
-                            message_to_AI.append({"role": "assistant", "content": answer})
-                            # Añadir el resultado del tool call como system message para el próximo turno del loop
-                            message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - MEMORIA]:\n{found_memories}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no encontraste información, díselo al usuario."})
-                            continue
+                                message_to_AI.append({"role": "assistant", "content": answer})
+                                # Añadir el resultado del tool call como system message para el próximo turno del loop
+                                message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - MEMORIA]:\n{found_memories}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no encontraste información, díselo al usuario."})
+                                continue
+
+                            if arg == "session":
+                                log_msg = f"[COMMAND] Inline READ executed. Reading session info"
+                                self.log_signal.emit(log_msg)
+                                print(log_msg)
+                                
+                                session_info = read_memory.read_session_info()
+                                result_text = session_info if session_info else "No se ha guardado información de la sesión."
+                                
+                                message_to_AI.append({"role": "assistant", "content": answer})
+                                message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - SESIÓN]:\n{result_text}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no hay soul, díselo."})
+                                continue
+
+                            if arg == "notifications":
+                                log_msg = f"[COMMAND] Inline READ executed. Reading notifications"
+                                self.log_signal.emit(log_msg)
+                                print(log_msg)
+                                
+                                notifications = read_memory.read_notifications()
+                                result_text = notifications if notifications else "No se ha guardado información de las notificaciones."
+                                
+                                message_to_AI.append({"role": "assistant", "content": answer})
+                                message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - NOTIFICACIONES]:\n{result_text}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no hay notificaciones, díselo al usuario."})
+                                continue
 
                         ###You can add whatever image u want that make u happy :D
 
