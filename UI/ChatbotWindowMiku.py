@@ -152,6 +152,12 @@ class ChatbotWindowMiku(QMainWindow):
     def send_message(self):
         user_message = self.user_input.text().strip()
         if user_message:
+            if not hasattr(self, 'weather_fetched'):
+                self.weather_fetched = True
+                import threading
+                from tools.get_weather import get_weather
+                threading.Thread(target=get_weather, daemon=True).start()
+
             # Custom styled HTML for user message using Miku Teal
             user_html = f'<p style="margin: 4px 0;"><b style="color: #FF1493;">You:</b> {user_message}</p>'
             self.user_input.clear()
@@ -164,7 +170,7 @@ class ChatbotWindowMiku(QMainWindow):
 
     def display_miku_response(self):
         self.send_button.setEnabled(False)
-        self.user_input.setEnabled(False)
+        self.user_input.setEnabled(True)
         self.send_button.setStyleSheet("background-color: gray;")
         
         # Iniciar animación de carga en la etiqueta de estado
