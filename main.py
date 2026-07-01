@@ -1,3 +1,4 @@
+from PySide6 import QtCore
 import sys
 from PySide6.QtWidgets import (QApplication)
 from UI.MainWindow import MainWindow
@@ -7,4 +8,3 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     app.exec()
-
