@@ -36,7 +36,7 @@ class Brain_cmd:
             return self.response
 
         elif cmd == "/read":
-            from tools import read_memory
+            from tools import read_memory, music_listener
             if argument == "soul":
                 text_to_read = read_memory.read_soul()
                 self.response = text_to_read if text_to_read else "(empty soul)"
@@ -46,6 +46,9 @@ class Brain_cmd:
             elif argument == "session":
                 text_to_read = read_memory.read_session()
                 self.response = text_to_read if text_to_read else "(empty session)"
+            elif argument == "music":
+                text_to_read = music_listener.read_music_info_wrapper()
+                self.response = text_to_read if text_to_read else "(empty music)"
             else:
                 self.response = f"unknown read argument: '{argument}'"
                 
