@@ -38,7 +38,7 @@ class configurationMiku(QMainWindow):
 
         # Left Menu List
         self.menu_list = QListWidget()
-        self.menu_list.addItems(["General", "Advanced Options", "About"])
+        self.menu_list.addItems(["General", "Advanced Options", "Conections","About"])
         self.menu_list.setFixedWidth(180)
         layout.addWidget(self.menu_list)
 
@@ -49,6 +49,7 @@ class configurationMiku(QMainWindow):
         # Agregar las páginas al stacked widget
         self.stacked_widget.addWidget(self.crear_page_general())
         self.stacked_widget.addWidget(self.crear_page_model())
+        self.stacked_widget.addWidget(self.crear_page_conections())
         self.stacked_widget.addWidget(self.crear_page_about())
             
         # Conexiones
@@ -69,6 +70,7 @@ class configurationMiku(QMainWindow):
         soul_data = load_soul_data()
         self.miku_idiom = soul_data.get("idiom", "Español")
         self.user_name = soul_data.get("name", "Usuario")
+        self.user_city = soul_data.get("city", "Bogotá")
         self.personalizated_promt = soul_data.get("personalizated_promt", "")
         self.miku_personality = soul_data.get("miku_personality", "Miku classic")
         
@@ -78,8 +80,9 @@ class configurationMiku(QMainWindow):
         self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
         self.secondary_model_name = model_config.get("secondary_model", "nex-agi/nex-n2-pro:free")
         
-        self.api_key = os.getenv("api_key")
-        self.server_url = os.getenv("url_api_key")
+        self.api_key = os.getenv("api_key", "")
+        self.server_url = os.getenv("url_api_key", "")
+        self.telegram_token = os.getenv("telegram_token", "")
 
     def save_config(self):
         from core.miku_config_manager import save_soul_prompt, save_soul_data, save_model_config
@@ -96,6 +99,7 @@ class configurationMiku(QMainWindow):
             save_soul_data({
                 "name": self.user_name,
                 "idiom": self.miku_idiom,
+                "city": self.user_city,
                 "personalizated_promt": self.personalizated_promt,
                 "miku_personality": self.miku_personality
             })
@@ -110,6 +114,7 @@ class configurationMiku(QMainWindow):
             with open(env_path, "w", encoding="utf-8") as f:
                 f.write(f"api_key={self.api_key}\n")
                 f.write(f"url_api_key={self.server_url}\n")
+                f.write(f"telegram_token={self.telegram_token}\n")
         except Exception as e:
             print(f"Error saving config: {e}")
 
@@ -130,6 +135,10 @@ class configurationMiku(QMainWindow):
         self.input_name = QLineEdit()
         self.input_name.setText(self.user_name)
         form.addRow("Name", self.input_name)
+
+        self.input_city = QLineEdit()
+        self.input_city.setText(self.user_city)
+        form.addRow("City", self.input_city)
 
         self.input_prompt = QTextEdit()
         self.input_prompt.setPlaceholderText("Personalizated Prompt")
@@ -164,11 +173,13 @@ class configurationMiku(QMainWindow):
     def guardar_configuracion(self):
         self.miku_idiom = self.combo_idioma.currentText()
         self.user_name = self.input_name.text()
+        self.user_city = self.input_city.text()
         self.personalizated_promt = self.input_prompt.toPlainText()
         self.miku_personality = self.input_personalities.currentText()
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
         self.secondary_model_name = self.secondary_model_selection.text()
+        self.telegram_token = self.input_telegram_token.text()
         
         # Guardar valores de configuración avanzada
         try:
@@ -205,6 +216,11 @@ class configurationMiku(QMainWindow):
         if not hasattr(self, 'user_name'):
             self.load_config()
         return self.user_name
+
+    def get_user_city(self):
+        if not hasattr(self, 'user_city'):
+            self.load_config()
+        return self.user_city
 
     def get_personalizated_promt(self):
         if not hasattr(self, 'personalizated_promt'):
@@ -274,6 +290,36 @@ class configurationMiku(QMainWindow):
         
         layout.addLayout(form)
         return page
+
+    def crear_page_conections(self):
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.addWidget(QLabel("<h2>Connections Settings</h2>"))
+        
+        self.conections_text = """<font color='green'>You can manage your conections to miku here :D.</font>"""
+        layout.addWidget(QLabel(self.conections_text))
+        
+        form = QFormLayout()
+        
+        # Telegram Token
+        self.input_telegram_token = QLineEdit()
+        self.input_telegram_token.setText(self.telegram_token)
+        form.addRow("Telegram Token:", self.input_telegram_token)
+             
+        layout.addLayout(form)
+
+        self.button_conectar = QPushButton("Guardar y Conectar")
+        self.button_conectar.clicked.connect(self.conectar_telegram)
+        layout.addWidget(self.button_conectar)    
+
+        self.button_salir = QPushButton("Salir")
+        self.button_salir.clicked.connect(self.close)
+        layout.addWidget(self.button_salir)
+        
+        return page
+
+    def conectar_telegram(self):
+        self.guardar_configuracion()
 
     def crear_page_about(self):
         page = QWidget()
