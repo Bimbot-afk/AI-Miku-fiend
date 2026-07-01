@@ -143,13 +143,14 @@ def save_soul_data(data_dict):
         "",
         f"- **name**: {data_dict.get('name', 'Usuario')}",
         f"- **idiom**: {data_dict.get('idiom', 'Español')}",
+        f"- **city**: {data_dict.get('city', 'Bogotá')}",
         f"- **personalizated_promt**: {data_dict.get('personalizated_promt', '')}",
         f"- **miku_personality**: {data_dict.get('miku_personality', 'Miku classic')}"
     ]
     
     # Append other keys if any
     for k, v in data_dict.items():
-        if k not in ["name", "idiom", "personalizated_promt", "miku_personality", "general_memories"]:
+        if k not in ["name", "idiom", "city", "personalizated_promt", "miku_personality", "general_memories"]:
             lines.append(f"- **{k}**: {v}")
             
     content = "\n".join(lines) + "\n"
