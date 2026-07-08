@@ -1,4 +1,11 @@
-﻿env/
+env/
 __pycache__/
 *.pyc
 .env
+
+# Archivos temporales de multi-agente
+miku_agent/WIP.md
+miku_agent/research.md
+miku_agent/research_results.md
+miku_agent/essay.docx
+miku_agent/weather_result.md
