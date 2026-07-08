@@ -3,24 +3,24 @@ import core.brain
 
 WIP_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "WIP.md")
 
+editor_notes_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "editor_notes.md")
+
 def edit_the_essay():
     with open(WIP_file, "r", encoding="utf-8") as f:
         essay = f.read()
     
     prompt = f"""
-    You are an expert editing agent tasked with editing the following essay:
+    You are an expert editing agent tasked with reviewing the following essay:
 
-    Your task is to edit the essay to improve its clarity, logic, and overall quality, write in the essay the corrections to be made, do not replace.
+    Your task is to read the essay and provide ONLY a bulleted list of corrections and suggestions to improve its clarity, logic, and overall quality.
+    DO NOT rewrite the entire essay. Just output the feedback notes.
 
-    dont be a dictator, if the essay is good, do not make corrections, and then you should say in the essay "the essay is good, no corrections needed"
+    If the essay is already very good and requires no changes, simply respond with: "The essay is good, no corrections needed."
     """
-    history = [{'role': 'user', 'content': prompt + str(essay)}]
-    worker = core.brain.consultar_miku(history, [])
-    worker.miku_config()
-    response_editor = worker.response
-    worker.start()
-    create_review_(response_editor)
-
-def create_review_(response_editor):
-    with open(WIP_file, "w", encoding="utf-8") as f:
+    history = [{'role': 'user', 'content': prompt + "\n\nEssay to review:\n" + str(essay)}]
+    from agent_functions.essay_agent_brain import sync_llm_call
+    print("[SYSTEM] Editing agent is reviewing...")
+    response_editor = sync_llm_call(history)
+    
+    with open(editor_notes_file, "w", encoding="utf-8") as f:
         f.write(response_editor)

@@ -1,11 +1,10 @@
 import os
 from docx import Document
-import core.brain
 
 WIP_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "WIP.md")
-essay_docx = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "essay.docx")
+essay_docx = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_creations", "essay.docx") 
 
-def yes_or_no(query):
+def yes_or_no(query, cc):
 
     with open(WIP_file, "r", encoding="utf-8") as f:
         essay_wip = f.read()
@@ -20,17 +19,14 @@ def yes_or_no(query):
     - The essay is well-cited.
 
     Do not write anything else, just "YES" or "NO".
-    
     """
     history = [{'role': 'user', 'content': prompt + str(essay_wip)}]
-    
-    worker = core.brain.consultar_miku(history, [])
-    worker.miku_config()
-    worker.start()
-    veredict = worker.response
+    from agent_functions.essay_agent_brain import sync_llm_call
+    print("[SYSTEM] Auditing agent is deciding...")
+    veredict = sync_llm_call(history)
     
     is_approved = veredict_check(veredict)
-    if is_approved:
+    if is_approved or cc == 1:
         create_essay_docx(essay_wip)
         return True
     else:
@@ -43,4 +39,4 @@ def create_essay_docx(essay_wip):
     doc = Document()
     doc.add_paragraph(essay_wip)
     doc.save(essay_docx)
-    print(f"Essay created successfully: {essay_docx}")
+    print(f"[SYSTEM] Essay created successfully: {essay_docx}")

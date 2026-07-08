@@ -4,15 +4,22 @@ from core.brain import consultar_miku
 research_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "research.md")
 WIP_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "WIP.md")
 
+editor_notes_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "miku_agent", "editor_notes.md")
+
 def draft_the_information(query, is_correction_cycle=False):
 
     with open(research_file, "r", encoding="utf-8") as f:
         research = f.read()
 
     editor_notes = ""
-    if is_correction_cycle and os.path.exists(WIP_file):
-        with open(WIP_file, "r", encoding="utf-8") as f:
-            editor_notes = f.read()
+    previous_essay = ""
+    if is_correction_cycle:
+        if os.path.exists(editor_notes_file):
+            with open(editor_notes_file, "r", encoding="utf-8") as f:
+                editor_notes = f.read()
+        if os.path.exists(WIP_file):
+            with open(WIP_file, "r", encoding="utf-8") as f:
+                previous_essay = f.read()
 
     prompt = f"""
     You are an expert drafting agent tasked with writing a comprehensive essay on the following topic:
@@ -26,22 +33,29 @@ def draft_the_information(query, is_correction_cycle=False):
     if is_correction_cycle:
         prompt += f"""
         
-    IMPORTANT: This is a correction cycle. The editing agent has reviewed the previous draft and left the following corrections/comments:
+    IMPORTANT: This is a correction cycle. The editing agent has reviewed your previous draft and left the following corrections/comments:
     ---
     {editor_notes}
     ---
-    Please rewrite the essay applying these corrections, and remove the editor's comments from the final text.
+    
+    Here is your PREVIOUS DRAFT:
+    ---
+    {previous_essay}
+    ---
+    
+    Please rewrite the essay applying these corrections. Output ONLY the new essay, no conversational text.
+
+    No more than 1500 words.
+
+    if reviewer says "abrupt cut" reduce in a 20% th length of the essay.
     """
 
     history = [{'role': 'user', 'content': prompt + "\nResearch:\n" + str(research)}]
     
-    worker = consultar_miku(history, [])
-    worker.miku_config()
-    worker.start()
-    create_the_essay(worker)
-
-def create_the_essay(worker):
-    response = worker.response
+    from agent_functions.essay_agent_brain import sync_llm_call
+    print("[SYSTEM] Drafting agent is writing...")
+    response = sync_llm_call(history)
+    
     with open(WIP_file, "w", encoding="utf-8") as f:
         f.write(response)
 
