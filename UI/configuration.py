@@ -83,6 +83,7 @@ class configurationMiku(QMainWindow):
         self.api_key = os.getenv("api_key", "")
         self.server_url = os.getenv("url_api_key", "")
         self.telegram_token = os.getenv("telegram_token", "")
+        self.research_api_key = os.getenv("research_api_key", "")
 
     def save_config(self):
         from core.miku_config_manager import save_soul_prompt, save_soul_data, save_model_config
@@ -115,6 +116,7 @@ class configurationMiku(QMainWindow):
                 f.write(f"api_key={self.api_key}\n")
                 f.write(f"url_api_key={self.server_url}\n")
                 f.write(f"telegram_token={self.telegram_token}\n")
+                f.write(f"research_api_key={self.research_api_key}\n")
         except Exception as e:
             print(f"Error saving config: {e}")
 
@@ -157,6 +159,10 @@ class configurationMiku(QMainWindow):
         self.input_server_url = QLineEdit()
         self.input_server_url.setText(self.server_url)
         form.addRow("Server URL", self.input_server_url)
+        
+        self.input_research_api_key = QLineEdit()
+        self.input_research_api_key.setText(self.research_api_key)
+        form.addRow("Research API Key (Tavily)", self.input_research_api_key)
              
         layout.addLayout(form)
 
@@ -178,6 +184,7 @@ class configurationMiku(QMainWindow):
         self.miku_personality = self.input_personalities.currentText()
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
+        self.research_api_key = self.input_research_api_key.text()
         self.secondary_model_name = self.secondary_model_selection.text()
         self.telegram_token = self.input_telegram_token.text()
         
@@ -251,6 +258,11 @@ class configurationMiku(QMainWindow):
         if not hasattr(self, 'secondary_model_name'):
             self.load_config()
         return self.secondary_model_name
+
+    def get_research_api_key(self):
+        if not hasattr(self, 'research_api_key'):
+            self.load_config()
+        return self.research_api_key
 
     def crear_page_model(self):
         page = QWidget()

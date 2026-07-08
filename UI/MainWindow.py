@@ -45,10 +45,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(label)
 
         # Punto Rojo para notificaciones
-        self.red_dot = QLabel("🔴", self)
-        self.red_dot.move(200, 20) # Movido a la esquina superior derecha de la ventana
-        self.red_dot.setStyleSheet("background: transparent; color: red; font-size: 16px;")
-        self.red_dot.hide()
+        ##self.red_dot = QLabel("🔴", self)
+        ##self.red_dot.move(200, 20) # Movido a la esquina superior derecha de la ventana
+        ##self.red_dot.setStyleSheet("background: transparent; color: red; font-size: 16px;")
+        ##self.red_dot.hide()
 
         # Worker para consultas silenciosas (como reaccionar a notificaciones)
         self.active_agent_workers = []
@@ -61,10 +61,10 @@ class MainWindow(QMainWindow):
 
     def handle_notification(self, noti_dict):
         # Crear un prompt para Miku
-        prompt = (f"[NUEVA NOTIFICACIÓN DE {noti_dict['app_name']}]\n"
-                  f"Título: {noti_dict['title']}\n"
-                  f"Mensaje: {noti_dict['content']}\n\n"
-                  "Piensa sobre esto y di algo al respecto de forma breve y natural.")
+        prompt = (f"[NEW NOTIFICATION FROM {noti_dict['app_name']}]\n"
+                  f"Title: {noti_dict['title']}\n"
+                  f"Message: {noti_dict['content']}\n\n"
+                  "Analyze this notification and provide a brief, helpful comment to keep the user productive. Be fun and engaging, but stay concise and highly functional.")
         
         message_history = [{'role': 'user', 'content': prompt}]
         
@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         popup.show()
 
         # Encender el punto rojo
-        self.red_dot.show()
+        ##self.red_dot.show()
 
         # Inyectar el mensaje en el chat SIEMPRE
         miku_html = f'<p style="margin: 4px 0;"><b style="color: #39c5bb;">Miku:</b> {response}</p>'
@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
         menu.exec(self.mapToGlobal(pos))
 
     def open_chat(self):
-        self.red_dot.hide()
+        ##self.red_dot.hide()
         self.idle_timer.start(self.miku_idle_timer) # Resetear timer
 
         self.chat_open.show()
