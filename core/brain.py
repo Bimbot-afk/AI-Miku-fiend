@@ -198,6 +198,7 @@ class consultar_miku(QThread):
         p += "\n\n[SISTEMA]: Se te ha proporcionado resultados de una búsqueda en la red abajo. Úsalos para responder al usuario de forma natural. NO uses más herramientas."
         return p
 
+
     def run(self):
         # 1. Cargar variables de entorno y crear cliente
         self.load_env()
@@ -372,6 +373,27 @@ class consultar_miku(QThread):
                                 message_to_AI.append({"role": "system", "content": f"[RESULTADO DE READ - SOUL]:\n{result_text}\n\nUsa esta información para continuar la conversación y responder al usuario. Si no hay soul, díselo."})
                                 continue
 
+                        elif cmd in ["essay", "agentessay"] or (cmd == "read" and arg == "essay"):
+                            from agent_functions import essay_agent_brain
+                            import threading
+                            log_msg = "[COMMAND] Inline ESSAY executed."
+                            self.log_signal.emit(log_msg)
+                            print(log_msg)
+                            
+                            # Extraer el tema correctamente según cómo haya alucinado el comando la IA
+                            topic = text if text and text.lower() != "essay" else arg
+                            if not topic or topic == "essay":
+                                topic = arg if arg else text
+                                
+                            # Execute in a background thread to prevent UI freezing
+                            threading.Thread(target=essay_agent_brain.create_and_really_good_essay, args=(topic,), daemon=True).start()
+
+                            check_message = f"Los agentes acaban de empezar a escribir un ensayo detallado sobre '{topic}'. Dile al usuario con entusiasmo que el ensayo se está creando y que tomará unos minutos. Sé EXTREMADAMENTE BREVE (máximo 2 oraciones cortas en total). NO des un resumen largo ni explicaciones, solo menciona el tema rápidamente. NO uses comandos."
+
+                            message_to_AI[0] = {'role': 'system', 'content': check_message}
+                            message_to_AI.append({"role": "assistant", "content": answer})
+                            continue
+
                             if arg == "memory":
                                 from core.miku_config_manager import load_memory_data
                                 log_msg = f"[COMMAND] Inline READ executed. Searching: '{text}'"
@@ -432,10 +454,6 @@ class consultar_miku(QThread):
                                     cat_img_path = os.path.join(cat_path, random.choice(cat_images)).replace("\\", "/")
                                     cat_image = f'<br><br><img src="file:///{cat_img_path}" width="200" style="border-radius: 8px;">'
                                     clean_answer += cat_image
-                            else:
-                                print(f"[SYSTEM] Could not find cat images path: {cat_path}")
-                            self.finished_response.emit(clean_answer)
-                            break
                             
                 except Exception as e:
                     err_msg = f"[SYSTEM] Error processing inline command: {e}"
