@@ -60,6 +60,10 @@ class MainWindow(QMainWindow):
         self.notification_worker.start()
 
     def handle_notification(self, noti_dict):
+        # Proteger: Si Miku está ocupada respondiendo en el chat, ignoramos la notificación
+        if hasattr(self, 'chat_open') and self.chat_open.active_workers:
+            return
+
         # Crear un prompt para Miku
         prompt = (f"[NEW NOTIFICATION FROM {noti_dict['app_name']}]\n"
                   f"Title: {noti_dict['title']}\n"
@@ -190,4 +194,7 @@ class MainWindow(QMainWindow):
         self.close()
 
     def idle_message(self):
+        # Proteger: Si Miku está ocupada respondiendo en el chat, ignoramos el evento de inactividad
+        if hasattr(self, 'chat_open') and self.chat_open.active_workers:
+            return
         create_idle_message(self)
