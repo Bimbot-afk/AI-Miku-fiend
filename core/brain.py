@@ -375,7 +375,7 @@ class consultar_miku(QThread):
                                 continue
 
                         elif cmd in ["essay", "agentessay"] or (cmd == "read" and arg == "essay"):
-                            from agent_functions import essay_agent_brain
+                            from agent_f import essay_agent_brain
                             import threading
                             log_msg = "[COMMAND] Inline ESSAY executed."
                             self.log_signal.emit(log_msg)
