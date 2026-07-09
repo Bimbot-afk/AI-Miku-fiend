@@ -76,6 +76,15 @@ class Brain_cmd:
             threading.Thread(target=essay_agent_brain.create_and_really_good_essay, args=(text,), daemon=True).start()
             self.response = f"essay creation started for: '{text}'"
             return self.response
+
+        elif cmd == "/open_app":
+            if not text:
+                self.response = "please specify the application to open."
+                return self.response
+            from tools import open_app
+            open_app.open_application(text)
+            self.response = f"application opened: '{text}'"
+            return self.response
             
             
         else:
