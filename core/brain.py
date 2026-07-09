@@ -298,6 +298,7 @@ class consultar_miku(QThread):
                         cmd = items[0].strip().lower().lstrip('/') # e.g. "save"
                         arg = items[1].strip().lower() if len(items) >= 2 else ""
                         text = items[2].strip() if len(items) >= 3 else ""
+                        focus_mode = items[3].strip().lower() if len(items) >= 4 else ""
                         
                         if cmd == "save":
                             from tools import open_txt_file
@@ -454,7 +455,28 @@ class consultar_miku(QThread):
                                     cat_img_path = os.path.join(cat_path, random.choice(cat_images)).replace("\\", "/")
                                     cat_image = f'<br><br><img src="file:///{cat_img_path}" width="200" style="border-radius: 8px;">'
                                     clean_answer += cat_image
-                            
+
+                        elif cmd == "openapplication":
+                            log_msg = "[COMMAND] Inline OPEN_APP executed."
+                            self.log_signal.emit(log_msg)
+                            print(log_msg)
+                            from tools import open_app
+                            result_msg = open_app.open_application(text)
+                            self.response = result_msg
+                            self.finished_response.emit(self.response)
+                            return
+
+                        elif cmd in ["starttimer", "start_timer"]:
+                            log_msg = f"[COMMAND] Inline START_TIMER executed. Focus mode: {focus_mode}"
+
+                            self.log_signal.emit(log_msg)
+                            print(log_msg)
+                            from UI import timmer_app
+                            result_msg = timmer_app.start_timer(text, focus_mode)
+                            self.response = result_msg
+                            self.finished_response.emit(self.response)
+                            return
+
                 except Exception as e:
                     err_msg = f"[SYSTEM] Error processing inline command: {e}"
                     self.log_signal.emit(err_msg)
