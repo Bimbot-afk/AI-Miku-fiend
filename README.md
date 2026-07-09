@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🧪 [ VERSIÓN BETA ] 🧪
-### *Funciones Agénticas e Implementación de APIs*
+### *Funciones Agénticass*
 
 ***
 </div>
@@ -87,7 +87,7 @@ Un asistente de inteligencia artificial de escritorio con interfaz gráfica inte
 * **Enviar mensajes**: Escribe en el campo de texto y presiona `Enter`.
 * **Miku Activa**: ¡Déjala en segundo plano! Ella notará si te ausentas o si cambias de canción y podría comentarlo (gracias a sus funciones agénticas).
 * **Reiniciar chat**: Presiona **Restart** para limpiar el historial temporal.
-* **Configuración Avanzada**: Abre el panel de configuración para modificar tu **ciudad** (para que Miku vea tu clima), nombre, idioma, personalidad, modelos de IA y tokens de conexión.
+* **Configuración Avanzada**: Abre el panel de configuración para modificar tu **ciudad** (para que Miku vea tu clima), nombre, idioma, personalidad y modelos de IA.
 
 ### Consola de Comandos (CMD Mode)
 Utiliza la barra de chat para enviar comandos directos:
