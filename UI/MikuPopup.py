@@ -1,7 +1,23 @@
 import sys
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QApplication
-from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QRect, QEasingCurve
+from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QRect, QEasingCurve, QObject, Signal
 from PySide6.QtGui import QIcon, QPixmap
+
+class PopupSignalEmitter(QObject):
+    show_popup_signal = Signal(str, str)
+
+popup_emitter = PopupSignalEmitter()
+_active_popup = None
+
+def _on_show_popup(title, message):
+    global _active_popup
+    _active_popup = MikuPopup(title, message)
+    _active_popup.show()
+
+popup_emitter.show_popup_signal.connect(_on_show_popup)
+
+def show_miku_popup(title, message):
+    popup_emitter.show_popup_signal.emit(title, message)
 
 class MikuPopup(QWidget):
     def __init__(self, title, message, parent=None):
