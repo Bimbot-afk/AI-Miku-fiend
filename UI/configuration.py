@@ -1,3 +1,4 @@
+from PySide6.QtWidgets import QCheckBox
 from PySide6.QtGui import QIcon
 import json
 import os
@@ -78,6 +79,7 @@ class configurationMiku(QMainWindow):
         self.miku_top_p = model_config.get("top_p", 0.6)
         self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
         self.secondary_model_name = model_config.get("secondary_model", "nex-agi/nex-n2-pro:free")
+        self.multi_agent = model_config.get("multi_agent", False)
         
         self.api_key = os.getenv("api_key", "")
         self.server_url = os.getenv("url_api_key", "")
@@ -106,7 +108,8 @@ class configurationMiku(QMainWindow):
                 "model": self.miku_model,
                 "temperature": self.miku_temperature,
                 "top_p": self.miku_top_p,
-                "secondary_model": self.secondary_model_name
+                "secondary_model": self.secondary_model_name,
+                "multi_agent": self.multi_agent
             })
             
             with open(env_path, "w", encoding="utf-8") as f:
@@ -146,6 +149,10 @@ class configurationMiku(QMainWindow):
         self.input_personalities.addItems(self.personalities)
         self.input_personalities.setCurrentText(self.miku_personality)
         form.addRow("Personalities", self.input_personalities)
+
+        self.check_box_focus_mode = QCheckBox("Focus mode")
+        self.check_box_focus_mode.setChecked(self.focus_mode)
+        form.addRow("Focus mode", self.check_box_focus_mode)
         
         self.input_api_key = QLineEdit()
         self.input_api_key.setText(self.api_key)
@@ -176,6 +183,7 @@ class configurationMiku(QMainWindow):
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
         self.secondary_model_name = self.secondary_model_selection.text()
+        self.multi_agent = self.check_box_multi_agent.isChecked()
         
         # Guardar valores de configuración avanzada
         try:

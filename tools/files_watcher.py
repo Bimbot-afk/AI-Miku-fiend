@@ -5,6 +5,13 @@ from core.miku_config_manager import load_model_config
 from UI.timmer_app import TimerApp
 from UI.MikuPopup import show_miku_popup
 
+def is_focus_mode():
+    model_config = load_model_config()
+    if model_config.get("focus_mode", False):
+        return True
+    else:
+        return False
+
 def files_watcher_main():
     if not dont_burn_tokens():
         list_all_important_files()
@@ -84,8 +91,11 @@ def files_watcher_games(): ##yes its names just as the file, absolute cinema, im
                 if match1 or match2 or match3:
                     info = f"¡Juego detectado! PID: {pinfo['pid']} | Nombre: {pinfo['name']}"
                     print(info)
-                    miku_popup_emit("CONCENTRATE AHORA >:C", f"He cerrado {g_clean} por tu bien.")
-                    ##proc.kill() will add later, idk, sounds risky
+                    if is_focus_mode():
+                        proc.kill()
+                        miku_popup_emit("CONCENTRATE AHORA >:C", f"He cerrado {g_clean} por tu bien.")
+                    else:
+                        miku_popup_emit("Hey", f"He detectado que tienes abierto {g_clean}")
                     break
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass

@@ -11,6 +11,11 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 class ChatbotWindowMiku(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
+        from core.miku_config_manager import load_memory_data
+        from core.i18n import get_text
+        self.idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        self.get_text = get_text
+
         self.main_window = main_window
         self.setWindowTitle("Miku Friend Chat")
         self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
@@ -43,17 +48,17 @@ class ChatbotWindowMiku(QMainWindow):
         
         # Create Line Edit for User Input
         self.user_input = QLineEdit()
-        self.user_input.setPlaceholderText("Text Miku here...")
+        self.user_input.setPlaceholderText(self.get_text(self.idiom, "placeholder"))
         self.user_input.returnPressed.connect(self.send_message)
         self.input_layout.addWidget(self.user_input)
 
         # Create Send Button
-        self.send_button = QPushButton("Send")
+        self.send_button = QPushButton(self.get_text(self.idiom, "btn_send"))
         self.send_button.clicked.connect(self.send_message)
         self.input_layout.addWidget(self.send_button)
 
         #create restart button
-        self.restart_button = QPushButton("Restart")
+        self.restart_button = QPushButton(self.get_text(self.idiom, "btn_restart"))
         self.restart_button.clicked.connect(self.restart_chat)
         self.input_layout.addWidget(self.restart_button)
         
@@ -101,7 +106,7 @@ class ChatbotWindowMiku(QMainWindow):
         self.message_history = []
         self.long_term_memory = []
         self.chat_history.clear()
-        self.chat_history.append('<p style="color: grey;">Chat restarted</p>')
+        self.chat_history.append(f'<p style="color: grey;">{self.get_text(self.idiom, "chat_restarted")}</p>')
         self.send_button.setEnabled(True)
         self.send_button.setStyleSheet("background-color: #39c5bb;")
         self.user_input.setEnabled(True)
@@ -151,7 +156,7 @@ class ChatbotWindowMiku(QMainWindow):
         self.send_button.setStyleSheet("background-color: gray;")
         
         # Iniciar animación de carga en la etiqueta de estado
-        self.status_label.setText("Miku is thinking.")
+        self.status_label.setText(self.get_text(self.idiom, "thinking") + ".")
         self.thinking_dots_count = 1
         self.thinking_timer.start(500) # Se actualiza cada 500ms
         
@@ -181,7 +186,7 @@ class ChatbotWindowMiku(QMainWindow):
 
         # mostrar error si no hay api/url
         if response == "error":
-            self.chat_history.append('<p style="color: red;">Error: API_KEY o Server URL no encontrado</p>')
+            self.chat_history.append(f'<p style="color: red;">{self.get_text(self.idiom, "error_api")}</p>')
             self.send_button.setEnabled(True)
             self.user_input.setEnabled(True)
             self.send_button.setStyleSheet("background-color: #39c5bb;")
@@ -212,7 +217,7 @@ class ChatbotWindowMiku(QMainWindow):
     def update_thinking_dots(self):
         self.thinking_dots_count = (self.thinking_dots_count % 3) + 1
         dots = "." * self.thinking_dots_count
-        self.status_label.setText(f"Miku is thinking{dots}")
+        self.status_label.setText(f"{self.get_text(self.idiom, 'thinking')}{dots}")
 
     def cleanup_worker(self, worker):
         if worker in self.active_workers:

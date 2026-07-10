@@ -213,7 +213,8 @@ def load_model_config():
         "model": "nex-agi/nex-n2-pro:free",
         "secondary_model": "nex-agi/nex-n2-pro:free",
         "temperature": 0.3,
-        "top_p": 0.6
+        "top_p": 0.6,
+        "multi_agent": False
     }
     if not os.path.exists(CONFIG_JSON_PATH):
         return default_config
@@ -224,7 +225,8 @@ def load_model_config():
                 "model": data.get("model", default_config["model"]),
                 "secondary_model": data.get("secondary_model", default_config["model"]),
                 "temperature": data.get("temperature", default_config["temperature"]),
-                "top_p": data.get("top_p", default_config["top_p"])
+                "top_p": data.get("top_p", default_config["top_p"]),
+                "multi_agent": data.get("multi_agent", default_config["multi_agent"])
             }
     except Exception as e:
         print(f"[SYSTEM] Error loading model config: {e}")
@@ -245,6 +247,7 @@ def save_model_config(config_dict):
         existing["secondary_model"] = config_dict.get("secondary_model", existing.get("secondary_model", "nex-agi/nex-n2-pro:free"))
         existing["temperature"] = config_dict.get("temperature", existing.get("temperature", 0.3))
         existing["top_p"] = config_dict.get("top_p", existing.get("top_p", 0.6))
+        existing["multi_agent"] = config_dict.get("multi_agent", existing.get("multi_agent", False))
         
         for key in ["idiom", "name", "personalizated_promt", "miku_personality", "base_prompt"]:
             existing.pop(key, None)

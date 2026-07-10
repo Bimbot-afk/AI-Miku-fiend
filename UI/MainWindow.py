@@ -2,7 +2,7 @@ from PySide6.QtCore import QThread, QTimer
 from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel, QMenu)
 from PySide6.QtCore import (QSize, Qt, QPoint)
 from PySide6.QtGui import (QImage, QPixmap, QIcon, QAction, QMovie)
-from UI.ChatbotWindowMiku import ChatbotWindowMiku
+from UI.chatbot_miku import ChatbotWindowMiku
 from UI.configuration import configurationMiku
 from UI.miku_cmd import MikuCMD
 from UI.MikuPopup import MikuPopup
@@ -63,12 +63,14 @@ class MainWindow(QMainWindow):
         # Proteger: Si Miku está ocupada respondiendo en el chat, ignoramos la notificación
         if hasattr(self, 'chat_open') and self.chat_open.active_workers:
             return
-
+        from core.miku_config_manager import load_memory_data
+        idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        
         # Crear un prompt para Miku
-        prompt = (f"[NEW NOTIFICATION FROM {noti_dict['app_name']}]\n"
-                  f"Title: {noti_dict['title']}\n"
-                  f"Message: {noti_dict['content']}\n\n"
-                  "Analyze this notification and provide a brief, helpful comment to keep the user productive. Be fun and engaging, but stay concise and highly functional.")
+        prompt = (f"[NUEVA NOTIFICACIÓN DE {noti_dict['app_name']}]\n"
+                  f"Título: {noti_dict['title']}\n"
+                  f"Mensaje: {noti_dict['content']}\n\n"
+                  f"Piensa sobre esto y di algo al respecto de forma breve y natural. [CRITICAL: Escribe tu respuesta obligatoriamente en este idioma: {idiom}]")
         
         message_history = [{'role': 'user', 'content': prompt}]
         
@@ -89,8 +91,13 @@ class MainWindow(QMainWindow):
         if response == "error":
             return
             
+        from core.miku_config_manager import load_memory_data
+        from core.i18n import get_text
+        idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        title_text = get_text(idiom, "popup_title")
+            
         # Crear un popup y mostrarlo
-        popup = MikuPopup(title="Miku says:", message=response)
+        popup = MikuPopup(title=title_text, message=response)
         self.popups.append(popup)
         popup.show()
 
