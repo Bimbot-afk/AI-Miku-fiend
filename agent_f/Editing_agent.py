@@ -18,7 +18,7 @@ def edit_the_essay():
     If the essay is already very good and requires no changes, simply respond with: "The essay is good, no corrections needed."
     """
     history = [{'role': 'user', 'content': prompt + "\n\nEssay to review:\n" + str(essay)}]
-    from agent_functions.essay_agent_brain import sync_llm_call
+    from agent_f.essay_agent_brain import sync_llm_call
     print("[SYSTEM] Editing agent is reviewing...")
     response_editor = sync_llm_call(history)
     

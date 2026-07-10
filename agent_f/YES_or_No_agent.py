@@ -21,7 +21,7 @@ def yes_or_no(query, cc):
     Do not write anything else, just "YES" or "NO".
     """
     history = [{'role': 'user', 'content': prompt + str(essay_wip)}]
-    from agent_functions.essay_agent_brain import sync_llm_call
+    from agent_f.essay_agent_brain import sync_llm_call
     print("[SYSTEM] Auditing agent is deciding...")
     veredict = sync_llm_call(history)
     

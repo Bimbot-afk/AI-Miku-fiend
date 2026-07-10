@@ -71,7 +71,7 @@ class Brain_cmd:
                 self.response = "please specify the topic for the essay."
                 return self.response
                 
-            from agent_functions import essay_agent_brain
+            from agent_f import essay_agent_brain
             import threading
             threading.Thread(target=essay_agent_brain.create_and_really_good_essay, args=(text,), daemon=True).start()
             self.response = f"essay creation started for: '{text}'"

@@ -52,7 +52,7 @@ def draft_the_information(query, is_correction_cycle=False):
 
     history = [{'role': 'user', 'content': prompt + "\nResearch:\n" + str(research)}]
     
-    from agent_functions.essay_agent_brain import sync_llm_call
+    from agent_f.essay_agent_brain import sync_llm_call
     print("[SYSTEM] Drafting agent is writing...")
     response = sync_llm_call(history)
     
