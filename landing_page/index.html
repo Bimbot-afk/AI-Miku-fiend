@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miku Friend </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Color variables (Miku Palette) */
+        :root {
+            --bg-color: #121516;
+            /* Dark cyber background */
+            --text-color: #e6eceb;
+            /* Light text */
+            --miku-teal: #39c5bb;
+            /* Miku Teal */
+            --miku-teal-hover: #4ee0d6;
+            --miku-pink: #e35b8f;
+            /* Pink accent */
+        }
+
+        /* Basic reset and typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* A super subtle gradient so it's not a boring flat color */
+            background: radial-gradient(circle at top, #1a2224 0%, var(--bg-color) 70%);
+        }
+
+        /* Main container */
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px 20px;
+        }
+
+        /* Title */
+        h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            /* Text effect with Miku color */
+            color: var(--miku-teal);
+            text-shadow: 0 0 20px rgba(57, 197, 187, 0.3);
+            letter-spacing: -1px;
+        }
+
+        /* Description */
+        p {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            color: #a0aab0;
+            /* A light gray for good contrast with the title */
+        }
+
+        /* Download button */
+        .download-btn {
+            display: inline-block;
+            background-color: var(--miku-teal);
+            color: #121516;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(57, 197, 187, 0.2);
+            border: 2px solid transparent;
+        }
+
+        /* Micro-animation on button hover */
+        .download-btn:hover {
+            background-color: var(--miku-teal-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(57, 197, 187, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Small note below the button */
+        .note {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #5d6b73;
+        }
+
+        .note span {
+            color: var(--miku-pink);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Miku Friend</h1>
+
+        <p>
+            Your personal autonomous assistant. Reacts to your notifications, keeps you company while you work, and chats
+            with you proactively. All in a lightweight agent that lives on your desktop.
+        </p>
+
+        <!-- The link will point to the .zip file when you upload it -->
+        <a href="MikuFriend_Release.zip" class="download-btn" download>
+            Download Miku Friend (.exe)
+        </a>
+
+        <p class="note">
+            For Windows 10/11 <span>♥</span> No installation required, just unzip and use.
+        </p>
+    </div>
+
+</body>
+
+</html>

@@ -9,3 +9,9 @@ miku_agent/research.md
 miku_agent/research_results.md
 miku_agent/essay.docx
 miku_agent/weather_result.md
+
+# Archivos de empaquetado (PyInstaller)
+build/
+dist/
+*.spec
+*.zip
