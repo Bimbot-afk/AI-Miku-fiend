@@ -11,9 +11,9 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 class ChatbotWindowMiku(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
-        from core.miku_config_manager import load_memory_data
+        from core.miku_config_manager import load_soul_data
         from core.i18n import get_text
-        self.idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        self.idiom = load_soul_data().get("idiom", "Español")
         self.get_text = get_text
 
         self.main_window = main_window

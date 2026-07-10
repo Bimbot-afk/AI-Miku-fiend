@@ -1,3 +1,4 @@
+from contextlib import AbstractAsyncContextManager
 import os
 from core.brain import consultar_miku
 

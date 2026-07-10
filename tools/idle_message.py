@@ -17,8 +17,8 @@ def create_idle_message(main_window):
     main_window.idle_timer.start(ms_to_seconds)
     print(f"miku idle time {ms_to_seconds/60000} minutes")
 
-    from core.miku_config_manager import load_memory_data
-    idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+    from core.miku_config_manager import load_soul_data
+    idiom = load_soul_data().get("idiom", "Español")
 
     prompt = f"[SISTEMA]: El usuario no te ha hablado en un buen rato. Inicia tú la conversación. Escribe un mensaje natural y corto como si le estuvieras hablando por chat, usa esta information, se lo mas personal posible: [CRITICAL: Escribe tu respuesta obligatoriamente en este idioma: {idiom}]"
     history = [{'role': 'user', 'content': prompt + str(read_session_data())}]

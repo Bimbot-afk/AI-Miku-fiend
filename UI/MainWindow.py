@@ -63,8 +63,8 @@ class MainWindow(QMainWindow):
         # Proteger: Si Miku está ocupada respondiendo en el chat, ignoramos la notificación
         if hasattr(self, 'chat_open') and self.chat_open.active_workers:
             return
-        from core.miku_config_manager import load_memory_data
-        idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        from core.miku_config_manager import load_soul_data
+        idiom = load_soul_data().get("idiom", "Español")
         
         # Crear un prompt para Miku
         prompt = (f"[NUEVA NOTIFICACIÓN DE {noti_dict['app_name']}]\n"
@@ -91,9 +91,9 @@ class MainWindow(QMainWindow):
         if response == "error":
             return
             
-        from core.miku_config_manager import load_memory_data
+        from core.miku_config_manager import load_soul_data
         from core.i18n import get_text
-        idiom = load_memory_data().get("soul", {}).get("idiom", "Español")
+        idiom = load_soul_data().get("idiom", "Español")
         title_text = get_text(idiom, "popup_title")
             
         # Crear un popup y mostrarlo
