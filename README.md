@@ -8,6 +8,7 @@
 ![License](https://img.shields.io/badge/license-MIT-39c5bb?style=flat-svg)
 
 ![Miku Friend Logo](https://i.ibb.co/BVzfJ5cS/MIKU.png)
+![Miku Friend URL]([text](https://bejewelled-banoffee-34df8f.netlify.app/))
 
 *Miku Friend no es solo un chatbot... ¡es una compañera viva en tu escritorio!*
 
