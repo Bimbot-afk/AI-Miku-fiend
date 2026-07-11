@@ -10,6 +10,7 @@ from core.notifications_listener import NotificationWorker
 from core.brain import consultar_miku
 from tools.idle_message import create_idle_message
 import ctypes
+from tools.path_utils import get_asset_path
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Miku Friend")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
+        self.setWindowIcon(QIcon(get_asset_path("assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png")))
         self.chat_open = ChatbotWindowMiku(self) # PRE-CARGADO
         self.cmd_window = None
         self.config_window = None
@@ -34,7 +35,7 @@ class MainWindow(QMainWindow):
         self.idle_timer.start(self.miku_idle_timer) # Inactividad dinámica
 
         label = QLabel()
-        self.movie = QMovie("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Gifs/m2.gif")
+        self.movie = QMovie(get_asset_path("assets/Miku1/m2/NoOutline/Gifs/m2.gif"))
         label.setMovie(self.movie)
         self.movie.start()
         label.resize(100,100)

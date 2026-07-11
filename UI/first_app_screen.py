@@ -95,9 +95,11 @@ class FirstAppScreen(QWidget):
         soul_data["idiom"] = idiom
         save_soul_data(soul_data)
 
-        # Guardar en .env y os.environ
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        env_path = os.path.join(base_dir, ".env")
+        import sys
+        if getattr(sys, 'frozen', False):
+            env_path = os.path.join(sys._MEIPASS, ".env")
+        else:
+            env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
         with open(env_path, "w", encoding="utf-8") as f:
             f.write(f"api_key={api_key}\n")
             f.write(f"url_api_key={url}\n")

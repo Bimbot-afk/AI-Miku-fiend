@@ -2,9 +2,17 @@ from asyncio import timeouts
 from PySide6.QtGui import QIcon
 from core.brain import consultar_miku
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel, QTextEdit, QLineEdit, QHBoxLayout)
-from PySide6.QtCore import (Qt, QTimer)
+from PySide6.QtCore import (Qt, QTimer, QThread, Signal)
 import ctypes
 import random
+from tools.path_utils import get_asset_path
+
+class FilesWatcherWorker(QThread):
+    finished_signal = Signal()
+    def run(self):
+        from tools.files_watcher import files_watcher_main
+        files_watcher_main()
+        self.finished_signal.emit()
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 
@@ -18,7 +26,7 @@ class ChatbotWindowMiku(QMainWindow):
 
         self.main_window = main_window
         self.setWindowTitle("Miku Friend Chat")
-        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
+        self.setWindowIcon(QIcon(get_asset_path("assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png")))
         self.setGeometry(100, 100, 300, 500)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.miku_thinking = False
@@ -115,6 +123,10 @@ class ChatbotWindowMiku(QMainWindow):
     def send_message(self):
         user_message = self.user_input.text().strip()
         if user_message:
+            if not hasattr(self, 'first_message_handled'):
+                self.first_message_handled = True
+                self.check_and_run_files_watcher()
+
             if not hasattr(self, 'weather_fetched'):
                 self.weather_fetched = True
                 import threading
@@ -130,6 +142,19 @@ class ChatbotWindowMiku(QMainWindow):
             self.message_history.append({'role': 'user', 'content': user_message})
                 
             self.display_miku_response()
+
+    def check_and_run_files_watcher(self):
+        from tools.files_watcher import dont_burn_tokens
+        if not dont_burn_tokens():
+            msg = self.get_text(self.idiom, "listing_files")
+            self.chat_history.append(f'<p style="color: grey; font-style: italic;">{msg}</p>')
+            self.files_watcher_worker = FilesWatcherWorker()
+            self.files_watcher_worker.finished_signal.connect(self.on_files_watcher_done)
+            self.files_watcher_worker.start()
+
+    def on_files_watcher_done(self):
+        msg = self.get_text(self.idiom, "listing_files_done")
+        self.chat_history.append(f'<p style="color: grey; font-style: italic;">{msg}</p>')
 
     def workers_working_brr():
         from agent_f import essay_agent_brain

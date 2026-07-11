@@ -8,9 +8,11 @@ from PySide6.QtWidgets import QFormLayout
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout, 
                                 QLabel, QTextEdit, QLineEdit, QHBoxLayout, QListWidget, QStackedWidget, QFrame)
 from PySide6.QtWidgets import QLabel
-from PySide6.QtCore import (Qt, QTimer)
-from dotenv import load_dotenv
+from PySide6.QtCore import Qt
+import os
+from dotenv import load_dotenv, set_key
 import ctypes
+from tools.path_utils import get_asset_path
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("miku_friend")
 
@@ -20,7 +22,7 @@ class configurationMiku(QMainWindow):
     def __init__(self, main_window=None):
         super().__init__(main_window)
         self.main_window = main_window
-        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
+        self.setWindowIcon(QIcon(get_asset_path("assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png")))
         self.setWindowTitle("Configuration")
         self.resize(800, 550)
         self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
@@ -79,7 +81,7 @@ class configurationMiku(QMainWindow):
         self.miku_top_p = model_config.get("top_p", 0.6)
         self.miku_model = model_config.get("model", "nex-agi/nex-n2-pro:free")
         self.secondary_model_name = model_config.get("secondary_model", "nex-agi/nex-n2-pro:free")
-        self.multi_agent = model_config.get("multi_agent", False)
+        self.focus_mode = model_config.get("focus_mode", False)
         
         self.api_key = os.getenv("api_key", "")
         self.server_url = os.getenv("url_api_key", "")
@@ -87,10 +89,11 @@ class configurationMiku(QMainWindow):
     def save_config(self):
         from core.miku_config_manager import save_soul_prompt, save_soul_data, save_model_config
         
-        # Detectar qué archivo .env usar
-        env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
-        env_in_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
-        env_path = env_in_folder if os.path.exists(env_in_folder) else env_in_root
+        import sys
+        if getattr(sys, 'frozen', False):
+            env_path = os.path.join(sys._MEIPASS, ".env")
+        else:
+            env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
 
         try:
             # Save configuration to respective markdown files and JSON config
@@ -109,7 +112,7 @@ class configurationMiku(QMainWindow):
                 "temperature": self.miku_temperature,
                 "top_p": self.miku_top_p,
                 "secondary_model": self.secondary_model_name,
-                "multi_agent": self.multi_agent
+                "focus_mode": self.focus_mode
             })
             
             with open(env_path, "w", encoding="utf-8") as f:
@@ -175,6 +178,7 @@ class configurationMiku(QMainWindow):
         return page
 
     def guardar_configuracion(self):
+        # Guardar valores
         self.miku_idiom = self.combo_idioma.currentText()
         self.user_name = self.input_name.text()
         self.user_city = self.input_city.text()
@@ -183,7 +187,7 @@ class configurationMiku(QMainWindow):
         self.api_key = self.input_api_key.text()
         self.server_url = self.input_server_url.text()
         self.secondary_model_name = self.secondary_model_selection.text()
-        self.multi_agent = self.check_box_multi_agent.isChecked()
+        self.focus_mode = self.check_box_focus_mode.isChecked()
         
         # Guardar valores de configuración avanzada
         try:

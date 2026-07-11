@@ -148,9 +148,11 @@ class consultar_miku(QThread):
             self.miku_personality = "Deeply in love with the user <3"
 
     def load_env(self):
-        env_in_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "env", ".env")
-        env_in_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
-        env_path = env_in_folder if os.path.exists(env_in_folder) else env_in_root
+        import sys
+        if getattr(sys, 'frozen', False):
+            env_path = os.path.join(sys._MEIPASS, ".env")
+        else:
+            env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
         
         load_dotenv(env_path, override=True)
         self.client = OpenRouter(

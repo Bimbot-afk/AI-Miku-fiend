@@ -6,9 +6,15 @@ from UI.first_app_screen import FirstAppScreen
 import UI.timmer_app # IMPORTANTE: Se importa aquí para inicializar el timer en el Hilo Principal
 import tools.files_watcher # IMPORTANTE: Se importa para inicializar señales de popups en Hilo Principal
 import tools.files_watcher as flw
+import os
 from dotenv import load_dotenv
 
-load_dotenv()
+def get_env_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, ".env")
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+
+load_dotenv(get_env_path(), override=True)
 window = None
 
 def start_main_app():
@@ -19,7 +25,12 @@ def start_main_app():
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
-    first_screen = FirstAppScreen(start_main_app)
-    first_screen.show()
+    # Si ya hay API Key en el .env, asumimos que ya pasó el setup
+    import os
+    if os.getenv("api_key") and os.getenv("api_key").strip() != "":
+        start_main_app()
+    else:
+        first_screen = FirstAppScreen(start_main_app)
+        first_screen.show()
     
     app.exec()

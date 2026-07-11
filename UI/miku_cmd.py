@@ -1,6 +1,8 @@
 import os
 from PySide6.QtGui import QIcon
-from core import cmd_brain
+from PySide6.QtCore import Qt, Signal
+import core.cmd_brain as cmd_brain
+from tools.path_utils import get_asset_path
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QWidget, QVBoxLayout, QLabel, QTextEdit, QLineEdit, QHBoxLayout)
 from PySide6.QtCore import (Qt, QTimer)
 import ctypes
@@ -13,7 +15,7 @@ class MikuCMD(QMainWindow):
         self.main_window = main_window
         self.setWindowTitle("Hatsune Miku - Command Line Mode")
         self.setGeometry(100, 100, 600, 400)
-        self.setWindowIcon(QIcon("C:/Users/emar0/Desktop/Proyectos/miku_friend/assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png"))
+        self.setWindowIcon(QIcon(get_asset_path("assets/Miku1/m2/NoOutline/Pngs/m2UpScale.png")))
         self.setWindowFlags(Qt.Window)
 
         # Historial de chat y comando activo
