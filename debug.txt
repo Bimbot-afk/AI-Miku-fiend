@@ -1,0 +1,4 @@
+frozen: True
+_MEIPASS: C:\Users\emar0\Desktop\Proyectos\miku_friend\dist\test_meipass\_internal
+executable: C:\Users\emar0\Desktop\Proyectos\miku_friend\dist\test_meipass\test_meipass.exe
+cwd: C:\Users\emar0\Desktop\Proyectos\miku_friend

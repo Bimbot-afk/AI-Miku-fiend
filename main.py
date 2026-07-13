@@ -1,5 +1,21 @@
-from PySide6 import QtCore
 import sys
+import os
+import traceback
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    error_msg = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    try:
+        with open("crash_log.txt", "a") as f:
+            f.write(error_msg + "\n")
+        import ctypes
+        ctypes.windll.user32.MessageBoxW(0, f"Error fatal detectado. Por favor envia esto al desarrollador:\n\n{error_msg}", "Error MikuFriend", 0x10)
+    except:
+        pass
+    sys.exit(1)
+
+sys.excepthook = handle_exception
+
+from PySide6 import QtCore
 from PySide6.QtWidgets import (QApplication)
 from UI.MainWindow import MainWindow
 from UI.first_app_screen import FirstAppScreen
