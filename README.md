@@ -1,7 +1,6 @@
 <div align="center">
 
 # Miku Friend AI
-### *Your Smart, Agentic, and Autonomous Virtual Companion*
 
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-39c5bb?style=flat-svg&logo=python&logoColor=white)
 ![UI Framework](https://img.shields.io/badge/UI-PySide6--Qt6-39c5bb?style=flat-svg&logo=qt&logoColor=white)
@@ -12,21 +11,20 @@
 
 [![Official Website](https://img.shields.io/badge/Official_Website-Visit_Us-39c5bb?style=for-the-badge)](https://bejewelled-banoffee-34df8f.netlify.app/)
 
-*Miku Friend isn't just a regular chatbot... she's a living, breathing companion right on your desktop!* ✨
 
 </div>
 
 ---
 
-## 🌟 What is Miku Friend AI?
+## What is Miku Friend AI?
 
-Miku Friend AI is a desktop assistant featuring an interactive and beautiful GUI, inspired by the virtual idol **Hatsune Miku**. But she's much more than just a simple question-and-answer bot. Built as an **Autonomous Agent**, Miku actually takes the initiative! 
+Miku Friend AI is a desktop assistant featuring an interactive and cool GUI, inspired by the Vocaloid **Hatsune Miku**. But she's much more than just a simple question-and-answer bot. Built as an **Autonomous Agent**, Miku actually takes the initiative! 
 
-She might start a conversation out of the blue, notice the music you're listening to, read your system notifications, or even scold you if you start playing games instead of focusing on your work. She also manages her own memories about you, making your interactions feel persistent, natural, and uniquely yours.
+She might start a conversation out of the blue, notice the music you're listening to, read your system notifications, or even scold you if you start playing games instead of focusing on your work. She also manages her own memories about you, making your interactions feel persistent, natural, and uniquely yours. 
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **She Has a Mind of Her Own**: Miku doesn't just wait for you to type. If you're idle, she might reach out. She reads your system notifications, knows what's playing on Spotify, and even checks your local weather.
 - **Focus Mode (Productivity First!)**: Need to get things done? Miku acts as your personal productivity coach. With her built-in smart timer and "Files Watcher," she keeps an eye on your background apps. Try launching a game while you're supposed to be studying, and she'll close it instantly and give you a piece of her mind!
@@ -36,7 +34,7 @@ She might start a conversation out of the blue, notice the music you're listenin
 
 ---
 
-## 🧠 How Her Brain Works (Architecture)
+## How Her Brain Works (Architecture)
 
 Curious about what's under the hood? Here's a quick tour of how Miku's files and modules are organized:
 
@@ -54,7 +52,7 @@ The main orchestrator that keeps everything running.
 - `miku_config_manager.py`: Handles all her internal settings.
 
 ### `agent_f/` (Her Little Helpers)
-Specialized background sub-agents that do the heavy lifting.
+Specialized background sub-agents that do a essay for you.
 - `research_agent.py`: Digs through the web for complex answers.
 - `essay_agent_brain.py`: Helps her write long, structured texts.
 - `YES_or_No_agent.py`: A quick decision-making bot for fast validations.
@@ -73,9 +71,9 @@ Markdown and JSON files where she stores everything she knows.
 
 ---
 
-## 🚀 Installation and Setup
+## Installation and Setup
 
-> **Note:** A super easy one-click installer is coming to our website soon! For now, here is how you can summon Miku using the terminal.
+> **Note:** A super easy one-click installer is coming to the website. For now, here is how you can summon Miku using the terminal.
 
 1. **Clone the repository**:
    ```bash
@@ -104,7 +102,7 @@ Markdown and JSON files where she stores everything she knows.
 
 ---
 
-## 🎮 Quick Usage Guide
+## Quick Usage Guide
 
 ### Just Hang Out
 - **Chat freely**: Just type in the box. If you leave her running in the background, she might randomly comment on a notification you just got or the song you just played!
@@ -120,7 +118,7 @@ Want to take direct control? Use these slash commands in the chat:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We'd love your help to make Miku even smarter! 
 1. Fork the repo.
