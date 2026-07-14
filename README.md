@@ -1,7 +1,7 @@
 <div align="center">
 
 # Miku Friend AI
-### *Your Agentic and Autonomous Virtual Assistant*
+### *Your Smart, Agentic, and Autonomous Virtual Companion*
 
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-39c5bb?style=flat-svg&logo=python&logoColor=white)
 ![UI Framework](https://img.shields.io/badge/UI-PySide6--Qt6-39c5bb?style=flat-svg&logo=qt&logoColor=white)
@@ -12,156 +12,122 @@
 
 [![Official Website](https://img.shields.io/badge/Official_Website-Visit_Us-39c5bb?style=for-the-badge)](https://bejewelled-banoffee-34df8f.netlify.app/)
 
-*Miku Friend is not just a chatbot... she is a living companion on your desktop!*
+*Miku Friend isn't just a regular chatbot... she's a living, breathing companion right on your desktop!* ✨
 
 </div>
 
 ---
 
-## Overview
+## 🌟 What is Miku Friend AI?
 
-Miku Friend AI is a desktop artificial intelligence assistant with an interactive graphical user interface, inspired by the virtual idol **Hatsune Miku**. Designed with an **Autonomous Agent** approach, Miku takes the initiative to start conversations, listen to your music, read your notifications, reprimand you if you get distracted by games (Focus Mode), and manage memories in a persistent and natural way.
+Miku Friend AI is a desktop assistant featuring an interactive and beautiful GUI, inspired by the virtual idol **Hatsune Miku**. But she's much more than just a simple question-and-answer bot. Built as an **Autonomous Agent**, Miku actually takes the initiative! 
 
----
-
-## Key Features
-
-- **Comprehensive Autonomous Agent**: Miku takes the initiative. If you are idle, she will reach out to you. She reads your system notifications, knows what music you are listening to, and checks the current weather in your local area.
-- **Focus Mode**: A smart timer with a "Files Watcher" that monitors your background processes. If you open a game while you should be studying or working, Miku will close it instantly and scold you.
-- **Authentic Personality**: Acts and responds like Miku, using natural and expressive language.
-- **Dual Intelligent Model Architecture**: Uses a primary model for fluid conversations and a secondary model for heavy background agentic processes like organizing files, detecting games, and summarizing memory, optimizing resource usage.
-- **Long and Short Term Memory**: Automatic context compression structure in Markdown format (`miku_memory.md`, `miku_soul.md`).
-- **Web Search**: Uses DuckDuckGo to search the internet in real-time.
+She might start a conversation out of the blue, notice the music you're listening to, read your system notifications, or even scold you if you start playing games instead of focusing on your work. She also manages her own memories about you, making your interactions feel persistent, natural, and uniquely yours.
 
 ---
 
-## Project Architecture and File Structure
+## ✨ Key Features
 
-Miku Friend AI is organized into several modules, separating the core agent logic, the graphical user interface, and the autonomous tools. Below is a detailed description of the project's file structure:
-
-### Root Directory
-- `main.py`: The main entry point of the application. It initializes the environment, loads configurations, and launches the Graphical User Interface (GUI).
-- `README.md`: The project documentation file you are currently reading.
-- `requirements.txt`: Contains all the Python dependencies required to run the project.
-- `.env`: Environment variables file storing your API keys and endpoint URLs.
-- `.gitignore`: Specifies intentionally untracked files that Git should ignore.
-- `LICENSE`: The MIT License file governing the project's distribution and usage.
-- `MikuFriend.spec`: PyInstaller specification file used for building the executable release version of the application.
-- `test_hc_direct2.py` / `test_openrouter2.py`: Test scripts used during development to verify API connections and routing.
-
-### `UI/` (User Interface)
-Contains all the graphical components built with PySide6.
-- `MainWindow.py`: The main chat window where the user interacts with Miku.
-- `MikuPopup.py`: Handles small popup notifications or alerts that Miku displays on the screen.
-- `chatbot_miku.py`: Contains the UI logic specifically for the chatbot interface and message rendering.
-- `configuration.py`: The settings window where users can adjust application parameters and API keys.
-- `first_app_screen.py`: The initial setup screen shown when the application is launched for the first time without an API key.
-- `miku_cmd.py`: A command-line interface or debug view embedded within the UI.
-- `timmer_app.py`: The timer widget used for the Focus Mode feature.
-
-### `core/` (Core Logic)
-The central nervous system and main orchestrator of the Miku agent.
-- `brain.py`: The core agent logic handling prompting, context assembly, and interaction flow.
-- `cmd_brain.py`: Handles the execution of special commands input by the user.
-- `config.json`: Configuration file specifying the primary and secondary Language Models to be used.
-- `i18n.py`: Internationalization script for handling multi-language support.
-- `miku_config_manager.py`: Manages reading and writing application configurations.
-- `notifications_listener.py`: Continuously listens to Windows system notifications to provide Miku with real-time context.
-
-### `agent_f/` (Agent Functions)
-Contains specialized sub-agents responsible for specific asynchronous or background tasks.
-- `Editing_agent.py`: A specialized agent for editing and refining text.
-- `YES_or_No_agent.py`: A binary decision-making agent used for quick validations.
-- `drafting_agent.py`: Responsible for drafting initial responses or content.
-- `essay_agent_brain.py`: Handles long-form text processing using the secondary LLM.
-- `research_agent.py`: Conducts background research and gathers information for complex queries.
-
-### `tools/` (Skills and Capabilities)
-Scripts that give Miku the ability to interact with the system and the outside world.
-- `files_watcher.py`: Scans running background processes to block games during Focus Mode.
-- `get_weather.py`: Fetches the local weather data.
-- `idle_message.py`: Triggers messages when the user has been inactive for a certain period.
-- `music_listener.py`: Detects the music currently playing on the system.
-- `open_app.py`: Executes applications and shortcuts on the user's command.
-- `open_txt_file.py`: Utility to read the contents of text files.
-- `read_memory.py`: Interfaces with the long-term memory files to retrieve past context.
-- `web_search.py`: Performs real-time internet searches using DuckDuckGo.
-
-### `miku_agent/` (Persistent Storage)
-Markdown and JSON files acting as Miku's memory and knowledge base.
-- `miku.md`: General state or instructions.
-- `miku_memory.md`: Stores long-term memories and facts about the user.
-- `miku_soul.md`: Defines the core personality, traits, and strict behavioral rules for Miku.
-- `miku_tools.md`: Documentation or schema of the tools available to the agent.
-- `notifications.md`: A temporary log of recent system notifications read by the agent.
-- `programs.md`: A cached list of the installed programs on the user's computer.
-- `organized_programs.json`: AI-generated classification of the user's applications, critical for identifying games during Focus Mode.
-
-### Other Directories
-- `landing_page/`: Contains the source code (`index.html`) and release packages (`MikuFriend_Release.zip`) for the official website.
-- `miku_creations/`: Output directory where files generated by the agent (such as essays or documents) are saved.
-- `assets/`: Contains visual resources such as images, icons, and fonts used by the UI.
-- `build/` & `dist/`: Directories generated by PyInstaller containing the compiled executable files.
-- `env/`: The Python virtual environment directory containing installed dependencies.
+- **She Has a Mind of Her Own**: Miku doesn't just wait for you to type. If you're idle, she might reach out. She reads your system notifications, knows what's playing on Spotify, and even checks your local weather.
+- **Focus Mode (Productivity First!)**: Need to get things done? Miku acts as your personal productivity coach. With her built-in smart timer and "Files Watcher," she keeps an eye on your background apps. Try launching a game while you're supposed to be studying, and she'll close it instantly and give you a piece of her mind!
+- **Dual-Brain Architecture**: To keep things fast and smooth, Miku uses two AI models. A fast primary model handles your fluid, real-time conversations, while a heavy-duty secondary model quietly works in the background to organize files, detect games, and summarize her memories.
+- **She Remembers You**: Using a smart, automatic context-compression system (`miku_memory.md` & `miku_soul.md`), she maintains both short-term context and long-term memories about your likes, dislikes, and past chats.
+- **Always Connected**: Miku can search the web in real-time using DuckDuckGo to answer your questions with up-to-date information.
 
 ---
 
-## Installation and Setup
+## 🧠 How Her Brain Works (Architecture)
 
-> **Note:** In the future, we will release a streamlined download page with an automatic installer. For now, here are the instructions to install it from the terminal.
+Curious about what's under the hood? Here's a quick tour of how Miku's files and modules are organized:
 
-1. **Clone this repository**:
+### `UI/` (The Face)
+Everything you see on screen, built with PySide6.
+- `MainWindow.py`: Your main chat room with Miku.
+- `MikuPopup.py`: Those little desktop notifications she sends you.
+- `configuration.py` & `first_app_screen.py`: Where you set up your API keys and customize her settings.
+- `timmer_app.py`: The UI for your Focus Mode timer.
+
+### `core/` (The Nervous System)
+The main orchestrator that keeps everything running.
+- `brain.py`: Where the magic happens. This handles her prompts, context, and how she talks to you.
+- `notifications_listener.py`: The module that secretly reads your Windows notifications so Miku knows what's going on.
+- `miku_config_manager.py`: Handles all her internal settings.
+
+### `agent_f/` (Her Little Helpers)
+Specialized background sub-agents that do the heavy lifting.
+- `research_agent.py`: Digs through the web for complex answers.
+- `essay_agent_brain.py`: Helps her write long, structured texts.
+- `YES_or_No_agent.py`: A quick decision-making bot for fast validations.
+
+### `tools/` (Her Senses and Skills)
+Scripts that allow Miku to interact with your PC.
+- `files_watcher.py`: The strict monitor that catches you playing games during Focus Mode.
+- `music_listener.py`: Helps her figure out what song you're vibing to.
+- `idle_message.py`: Triggers her to say hi when you've been quiet for too long.
+
+### `miku_agent/` (Her Memory)
+Markdown and JSON files where she stores everything she knows.
+- `miku_soul.md`: The core of who she is—her personality, rules, and traits.
+- `miku_memory.md`: The diary of your friendship. Long-term memories go here.
+- `organized_programs.json`: The AI-generated list that helps her tell the difference between "Photoshop" (work) and "Minecraft" (game).
+
+---
+
+## 🚀 Installation and Setup
+
+> **Note:** A super easy one-click installer is coming to our website soon! For now, here is how you can summon Miku using the terminal.
+
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/Bimbot-afk/AI-Miku-fiend.git
    cd AI-Miku-fiend
    ```
 
-2. **Create a virtual environment and install dependencies**:
+2. **Set up the environment**:
    ```bash
    python -m venv env
    env\Scripts\activate
    pip install -r requirements.txt
    ```
 
-3. **Configure your credentials (`.env`)**:
-   Create a file named `.env` in the root of the project. You must add your API Key from OpenRouter or your preferred provider.
+3. **Give her the keys (`.env`)**:
+   Create a file named `.env` in the root folder and paste your API key (from OpenRouter or your favorite provider).
    ```env
    api_key=YOUR_API_KEY_HERE
    url_api_key=https://openrouter.ai/api/v1
    ```
 
-4. **Launch Miku**:
+4. **Wake her up**:
    ```bash
    python main.py
    ```
 
 ---
 
-## Quick Usage Guide
+## 🎮 Quick Usage Guide
 
-### Natural Interaction
-- **Chat Freely**: Simply type in the text box. If you leave her in the background and play music or receive a Windows notification, Miku will know and might bring it up to start a conversation.
-- **Focus Mode**: When you need to work, ask Miku for a timer. The Files Watcher will activate. If you try to open a game during your study time, Miku will intervene and close it to keep you productive.
+### Just Hang Out
+- **Chat freely**: Just type in the box. If you leave her running in the background, she might randomly comment on a notification you just got or the song you just played!
+- **Time to Work (Focus Mode)**: Tell Miku you need to concentrate. She'll set a timer and activate the Files Watcher. Don't even try opening a game—she will catch you and close it!
 
-### Command Console (Admin Mode)
-Type these commands directly into the chat to manually operate the system:
-- `/save soul <text>` : Appends permanent rules to her personality profile.
-- `/save memory <text>` : Forces the writing of a long-term memory about you.
-- `/read <soul | session | notifications | music>` : Forces Miku to read a specific data sensor.
-- `/web_search <text>` : Manually commands a web search.
-- `/start_timer <ms>` : Starts the Focus Mode for a specific time in milliseconds.
-- `/happymiku` : Triggers a special reaction.
+### Admin Commands
+Want to take direct control? Use these slash commands in the chat:
+- `/save soul <text>` : Teach her a permanent new personality rule.
+- `/save memory <text>` : Force her to remember a specific fact about you.
+- `/read <soul | session | notifications | music>` : Manually tell her to check one of her sensors.
+- `/start_timer <ms>` : Start the Focus Mode timer (in milliseconds).
+- `/happymiku` : Try it and see what happens! ✨
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-All help is welcome to make Miku even smarter!
-1. Fork this repository.
-2. Create a feature branch (`git checkout -b feature/NewFeature`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature/NewFeature`).
-5. Open a Pull Request.
+We'd love your help to make Miku even smarter! 
+1. Fork the repo.
+2. Create your feature branch (`git checkout -b feature/CoolNewIdea`).
+3. Commit your changes (`git commit -m 'Added something awesome'`).
+4. Push to the branch (`git push origin feature/CoolNewIdea`).
+5. Open a Pull Request!
 
 ---
 
