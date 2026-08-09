@@ -26,6 +26,18 @@ She might start a conversation out of the blue, notice the music you're listenin
 
 ---
 
+## Cool Stuff To Do With Me
+
+Not sure what to do first? Here are a few awesome things you can try right now:
+- **Play Your Favorite Songs**: Turn on some music on Spotify, YouTube, or your media player. Leave Miku in the background and wait... she'll eventually notice what you're listening to and talk to you about it! (you can ask her for it too!!)
+- **Get Back to Work! (Focus Mode)**: Tell Miku "I need to study for 30 minutes". She will start a timer on your screen. Try opening a game (like Minecraft or Steam)... she'll instantly close it and scold you for slacking off! (only iff you turn on focus mode)
+- **Ask For An Essay**: Got homework? Tell Miku to write an essay about a specific topic. She'll use her secondary agentic brain to research and draft a long-form document just for you.
+- **Let Her Manage Your Notifications**: Keep Miku running while you work. When you get a Windows notification (like an email or a Discord message), she will secretly read it and might let you know about it naturally in conversation.
+- **The "30-Minute Check-in"**: If you are quiet and haven't talked to her in a while, she gets bored! She will send you an idle message to check up on you or share a random thought.
+- **Ask for the Weather**: Ask her how the weather is looking in your city, and she'll tell you exactly what you need to wear today.
+
+---
+
 ## Key Features
 
 - **She Has a Mind of Her Own**: Miku doesn't just wait for you to type. If you're idle, she might reach out. She reads your system notifications, knows what's playing on Spotify, and even checks your local weather.
