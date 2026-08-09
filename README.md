@@ -22,6 +22,8 @@ Miku Friend AI is a desktop assistant featuring an interactive and cool GUI, ins
 
 She might start a conversation out of the blue, notice the music you're listening to, read your system notifications, or even scold you if you start playing games instead of focusing on your work. She also manages her own memories about you, making your interactions feel persistent, natural, and uniquely yours. 
 
+
+
 ---
 
 ## Key Features
@@ -31,6 +33,9 @@ She might start a conversation out of the blue, notice the music you're listenin
 - **Dual-Brain Architecture**: To keep things fast and smooth, Miku uses two AI models. A fast primary model handles your fluid, real-time conversations, while a heavy-duty secondary model quietly works in the background to organize files, detect games, and summarize her memories.
 - **She Remembers You**: Using a smart, automatic context-compression system (`miku_memory.md` & `miku_soul.md`), she maintains both short-term context and long-term memories about your likes, dislikes, and past chats.
 - **Always Connected**: Miku can search the web in real-time using DuckDuckGo to answer your questions with up-to-date information.
+
+ <img width="718" height="451" alt="Captura de pantalla 2026-07-17 235255" src="https://github.com/user-attachments/assets/91797305-8cb4-4494-8ee5-09a0f6ad14a8" />
+
 
 ---
 
