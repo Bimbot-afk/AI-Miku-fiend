@@ -14,9 +14,9 @@
 
 <br>
 
-# ☢️☢️☢️☢️☢️ NO CODE INSTALLATION HERE! ☢️☢️☢️☢️☢️
+# ☢️ NO CODE INSTALLATION HERE! 
 ### **Don't want to look like hackerman? You don't have to!**
-### 👉 **[CLICK HERE TO DOWNLOAD THE READY-TO-USE .EXE APP](https://bejewelled-banoffee-34df8f.netlify.app/)** 👈
+### **[CLICK HERE TO DOWNLOAD THE READY-TO-USE .EXE APP](https://bejewelled-banoffee-34df8f.netlify.app/)**
 *(Just download the .zip from the website, extract it, and run MikuFriend.exe! No code required.)*
 
 </div>
@@ -152,6 +152,12 @@ We'd love your help to make Miku even smarter!
 5. Open a Pull Request!
 
 ---
+
+## whats next?
+
+1. Jev IA - it literally solves one the probelm due I had to add to models, will be updating soon
+2. Make it connect with others apps, maybe some cool integration w gemini sparks
+3. More customization options, like change the miku outfit :D
 
 <div align="center">
 
